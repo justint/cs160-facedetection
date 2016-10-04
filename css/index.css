@@ -1,0 +1,57 @@
+/* Container for all content below navbar, above footer */
+.container {
+  width: 750px;
+  padding: 0;
+}
+
+.notification-area {
+  width: 100%;
+}
+
+.row {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* List of jobs */
+.job-list {
+  width: 73%;
+  float: left;
+}
+
+/* Job elements in job-list */
+.job {
+  padding: 10px;
+}
+/* Job thumbnails */
+.job > img {
+  width: 100px;
+  height: 100px;
+}
+
+.add-job {
+  text-align: center;
+  font-size: 20px;
+  color: #ccc;
+  transition: all 0.3s ease 0s;
+}
+.add-job:hover {
+  text-align: center;
+  font-size: 20px;
+  color: #444;
+  transition: all 0.3s ease 0s;
+}
+
+/* Sidebar with panels */
+.sidebar {
+  width: 25%;
+  float: left;
+  margin-left: 2%;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  padding-bottom: 15px;
+  width: 100%;
+}
