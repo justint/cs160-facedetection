@@ -1,3 +1,14 @@
+/* Remove round edges at top corners of nav bar */
+.navbar {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+/* Nav bar elements */
+.navbar-nav {
+  padding-right: 50px;
+}
+
 /* Container for all content below navbar, above footer */
 .container {
   width: 750px;
@@ -8,25 +19,59 @@
   width: 100%;
 }
 
+#test-alert {
+  opacity: 0;
+}
+
 .row {
   margin-left: 0;
   margin-right: 0;
 }
 
-/* List of jobs */
-.job-list {
+/* Left column /w list of jobs */
+.column {
   width: 73%;
   float: left;
 }
 
+.no-job-text {
+  text-align: center;
+  color: #ccc;
+  font-style: italic;
+  opacity: 1;
+}
+
 /* Job elements in job-list */
-.job {
+div.job {
   padding: 10px;
 }
 /* Job thumbnails */
 .job > img {
   width: 100px;
   height: 100px;
+}
+.job > table {
+  border: 0px;
+  width: 100%;
+}
+.job-body {
+  width: 400px;
+  height: 100px;
+}
+.job-name {
+  font-weight: bold;
+}
+.job-num {
+  text-align:right;
+  font-style:italic;
+  color: #ccc;
+}
+.job-submitdatetime {
+  color: #333;
+  font-style: italic;
+}
+.job-buttons {
+  text-align: right;
 }
 
 .add-job {
@@ -40,6 +85,11 @@
   font-size: 20px;
   color: #444;
   transition: all 0.3s ease 0s;
+}
+/* Newly added job, for fade-in animation */
+div.new-job {
+  opacity: 0;
+  margin-top: 50px;
 }
 
 /* Sidebar with panels */

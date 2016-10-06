@@ -1,7 +1,10 @@
 var express = require("express");
 var app = express();
+var bodyParser = require('body-parser');
 var router = express.Router();
 var path = __dirname + '/views/';
+
+app.use(bodyParser.urlencoded({ extended: true }));
 
 router.use(function (req,res,next) {
   console.log("/" + req.method);
@@ -20,9 +23,15 @@ router.get("/dashboard",function(req,res){
   res.sendFile(path + "dashboard.html");
 });
 
-router.get("/css/index.css",function(req,res){
-  res.sendFile(__dirname + "/css/index.css");
+app.post('/', function (req, res) {
+    console.log("Incoming job:");
+    console.log(req.body);
+    res.send('OK');
 });
+
+app.use('/css',express.static(__dirname+'/css'));
+app.use('/js',express.static(__dirname+'/js'));
+app.use('/img',express.static(__dirname+'/img'));
 
 app.use("/",router);
 
