@@ -42,3 +42,9 @@ jspm_packages
 
 # Output of 'npm pack'
 *.tgz
+
+# Uploaded videos
+uploads
+
+# Thumbnails
+.DS_Store

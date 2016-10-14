@@ -15,22 +15,21 @@
 <link href="css/index.css" rel="stylesheet">
 </head>
 <body>
-<div>
-<div>
-<nav class="navbar navbar-inverse" role="navigation">
-  <!--
-     <ul class="nav navbar-nav">
-      <li class="active"><a href="/">Home<span class="sr-only">(current)</span></a></li>
-      <li><a href="/about">About us</a></li>
-      <li><a href="/contact">Contact us</a></li>
+<div class="navbar-area">
+  <nav class="navbar navbar-inverse" role="navigation">
+    <!--
+       <ul class="nav navbar-nav">
+        <li class="active"><a href="/">Home<span class="sr-only">(current)</span></a></li>
+        <li><a href="/about">About us</a></li>
+        <li><a href="/contact">Contact us</a></li>
+      </ul>
+    -->
+    <ul class="nav navbar-nav navbar-right">
+              <li><a href="#"><span class="glyphicon glyphicon-user" aria-hidden="true"> </span>&nbsp;&nbsp;Justin</a></li>
+              <li><a href="#">Settings</a></li>
+              <li><a href="#">Help</a></li>
     </ul>
-  -->
-  <ul class="nav navbar-nav navbar-right">
-            <li><a href="#"><span class="glyphicon glyphicon-user" aria-hidden="true"> </span>&nbsp;&nbsp;Justin</a></li>
-            <li><a href="#">Settings</a></li>
-            <li><a href="#">Help</a></li>
-  </ul>
-</nav>
+  </nav>
 </div>
 <div class="container">
   <div class="notification-area">
@@ -89,7 +88,13 @@
           <h3 class="panel-title">New Job</h3>
         </div>
         <div class="panel-body">
-          Panel content
+          <form id="video-submit" method="post" action="/" target="dead_iframe" enctype="multipart/form-data">
+            <input type="file" id="video-file" name="video-file"></input>
+            <select id="cv-implementation">
+              <option value="default">face_rectangle</option>
+            </select>
+            <button type="submit">Start job</button>
+          </form>
         </div>
       </div>
     </div>
@@ -101,5 +106,6 @@
   </div>
 </div>
 <script src="js/jquery-test.js"></script>
+<iframe height="0" width="0" name="dead_iframe"></iframe>
 </body>
 </html>

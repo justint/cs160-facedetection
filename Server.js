@@ -1,8 +1,14 @@
 var express = require("express");
-var app = express();
+var multer = require("multer");
 var bodyParser = require('body-parser');
+
 var router = express.Router();
 var path = __dirname + '/views/';
+var upload = multer({ dest: 'uploads/' });
+
+var app = express();
+
+
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -23,10 +29,11 @@ router.get("/dashboard",function(req,res){
   res.sendFile(path + "dashboard.html");
 });
 
-app.post('/', function (req, res) {
+app.post('/', upload.single('video-file'), function (req, res, next) {
     console.log("Incoming job:");
     console.log(req.body);
-    res.send('OK');
+    console.log(req.file);
+    res.status(200).send();
 });
 
 app.use('/css',express.static(__dirname+'/css'));

@@ -45,7 +45,7 @@ function genJob() {
       var preFrameCount = "</td></tr><tr><td>Frames: ";
       var preFrameRate = "</td></tr><tr><td>Framerate: ";
       var preSubmitDateTime =" frames/second</td></tr><tr><td class=\"job-submitdatetime\">";
-      var rest = "</td><td class=\"job-buttons\"><button>Download</button></td></tr></table></td></tr></table></div>";
+      var rest = "</td><td class=\"job-buttons\"><button>Start job</button></td></tr></table></td></tr></table></div>";
 
       returnString = preFilename + jobData.filename + preJobId + jobData.jobNum +
         preFrameCount + jobData.frameCount + preFrameRate + jobData.frameRate +
@@ -56,4 +56,23 @@ function genJob() {
       returnString = "<p>bad server response</p>";
   });
   return returnString;
-};
+}
+
+/*
+$("#video-submit").submit(function(e) {
+  e.preventDefault();
+
+  var video = document.getElementById("video-file");
+
+  var jobData = {
+    video: document.getElementById("video-file"),
+    cvSelection: document.getElementById("cv-implementation").value
+  }
+
+  $.ajax({
+    url: "http://localhost:3000/",
+    data: video,
+    method: "POST",
+  }).done(alert("It works!")).fail(alert("It failed :("));
+});
+*/
