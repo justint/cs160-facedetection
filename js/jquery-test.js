@@ -1,13 +1,15 @@
 var jobCount = 0;
 
-// Add job process
+// Display new job panel
 $( "#add-job" ).click(function() {
-  // check if detached already
-  if (jobCount == 0) $('.no-job-text').animate({"opacity": "0"}, 700).detach();
-  $('.job-list').append( genJob() );
-  $('.new-job').slideDown("fast");
-  $('.new-job').animate({"opacity": "1", "marginTop": 0}, 500);
+  $("#new-job-panel").removeClass("hide");
+  $("#new-job-panel").animate({
+    "margin-top" : 0,
+    "opacity": 1
+  }, 500 );
+
 });
+
 
 // Debug job complete notification
 $(document).keypress(
@@ -17,62 +19,81 @@ $(document).keypress(
       $('#test-alert').animate({"opacity": 1}, 500);
     }});
 
-// Generates new job data + HTML
-function genJob() {
-  jobCount++;
-
-  // This is the part where you grab video data (filename, frame count, etc)
-  // ...
-  // Random names/frame counts are given for debug
-  var jobData = {
-    filename: "video-" + (Math.random() * 10).toFixed(0),
-    jobNum: jobCount,
-    frameCount: (Math.random() * 10000).toFixed(0),
-    frameRate: Math.round(Math.random()) == 1 ? 24 : 30,
-    submitDateTime: new Date()
-  }
-
-  var returnString;
-  $.ajax({
-    url: "http://localhost:3000/",
-    data: jobData,
-    async: false,
-    method: "POST"
-    }).done(function() {
-      // Boilerplate HTML code for job list element
-      var preFilename = "<div class=\"job new-job panel panel-default\"><table class=\"job\"><tr><td><img data-src=\"holder.js/200x200\" class=\"job img-thumbnail\" alt=\"100x100\" src=\"img/thumbnail.gif\" data-holder-rendered=\"true\"></td><td class=\"job-body\"><table class=\"job job-body\"><tr><td class=\"job-name\">";
-      var preJobId = "</td><td class=\"job-num\">";
-      var preFrameCount = "</td></tr><tr><td>Frames: ";
-      var preFrameRate = "</td></tr><tr><td>Framerate: ";
-      var preSubmitDateTime =" frames/second</td></tr><tr><td class=\"job-submitdatetime\">";
-      var rest = "</td><td class=\"job-buttons\"><button>Start job</button></td></tr></table></td></tr></table></div>";
-
-      returnString = preFilename + jobData.filename + preJobId + jobData.jobNum +
-        preFrameCount + jobData.frameCount + preFrameRate + jobData.frameRate +
-        preSubmitDateTime + jobData.submitDateTime + rest;
-    }).fail(function() {
-      alert("fail");
-      // Return malformed job element on bad server response
-      returnString = "<p>bad server response</p>";
-  });
-  return returnString;
+// Error message for bad filetype upload
+function errorFiletype() {
+  $('.notification-area').append("<div class=\"alert alert-warning alert-dismissable\" id=\"alert-improperfiletype\" role=\"alert\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button><strong>Improper filetype!</strong> The file you selected for upload is not a video. Please upload a video file.</div>");
+  $('#alert-improperfiletype').animate({"opacity": 1}, 500);
 }
 
-/*
+// New job submission function
 $("#video-submit").submit(function(e) {
   e.preventDefault();
 
-  var video = document.getElementById("video-file");
+  var form = this;
+  var video = form.elements["video-file"];
 
-  var jobData = {
-    video: document.getElementById("video-file"),
-    cvSelection: document.getElementById("cv-implementation").value
+  var videoType = form.elements["video-file"].files[0].type;
+
+  // Verify video mimetype, throw error if invalid
+  if (!videoType.match(/video\/./))
+  {
+    errorFiletype();
+    return;
   }
 
-  $.ajax({
-    url: "http://localhost:3000/",
-    data: video,
-    method: "POST",
-  }).done(alert("It works!")).fail(alert("It failed :("));
+  // Hide no-job text
+  if (jobCount == 0) $('.no-job-text').animate({"opacity": "0"}, 700).detach();
+
+  jobCount++;
+
+  var jobData = {
+    filename: video.files[0].name,
+    jobNum: jobCount,
+    filesize: video.files[0].size,
+    submitDateTime: new Date(),
+    status: "waiting to start"
+  }
+
+  // Update form job number
+  form.elements["job-number"].value = jobCount;
+
+  // Produce awful html blocks for new job
+  var preFilename = "<div class=\"job new-job panel panel-default\"><table class=\"job\"><tr><td class=\"job-thumbnail\"><img data-src=\"holder.js/200x200\" class=\"job img-thumbnail\" alt=\"100x100\" src=\"img/thumbnail.gif\" data-holder-rendered=\"true\"></td><td class=\"job-body\"><table class=\"job job-body\"><tr><td class=\"job-name\">";
+  var preJobId = "</td><td class=\"job-num\">";
+  var preFilesize = "</td></tr><tr><td>Filesize: ";
+  var preSubmitDateTime = " bytes</td></tr><tr><td>Submit time: ";
+  var preStatus ="</td></tr><tr><td>Status: ";
+  var rest = "</td><td class=\"job-buttons\"><button id=\"start-job-button\">Start job</button></td></tr></table></td></tr></table></div>";
+
+  // Concatenate this ugly disgusting new job
+  var newJobHTML = preFilename + jobData.filename + preJobId + jobData.jobNum +
+    preFilesize + jobData.filesize + preSubmitDateTime + jobData.submitDateTime +
+    preStatus + jobData.status + rest;
+
+  form.submit();
+
+  // Add job to job-list
+  $('.job-list').append( newJobHTML );
+  $('.new-job').slideDown("fast");
+  $('.new-job').animate({"opacity": "1", "marginTop": 0}, 500);
+
+  // Hide add-job panel
+  $("#new-job-panel").animate({
+    "opacity": 0,
+    "margin-top": "100px"
+  }, 500 );
+
 });
-*/
+
+$(document).on('click', "#start-job-button", function() {
+    var jobNum = $(".job-num")[0].textContent;
+
+    $.ajax({
+      url: "/start-job",
+      method: "POST",
+      data: { num: jobNum }
+    })
+      .done(function(e) {
+        alert("Job started: " + e);
+    });
+});

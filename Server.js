@@ -17,19 +17,25 @@ router.use(function (req,res,next) {
   next();
 });
 
-router.get("/",function(req,res){
+router.get("/", function(req,res){
   res.sendFile(path + "index.html");
 });
 
-router.get("/stats",function(req,res){
+router.get("/stats", function(req,res){
   res.sendFile(path + "stats.html");
 });
 
-router.get("/dashboard",function(req,res){
+router.get("/dashboard", function(req,res){
   res.sendFile(path + "dashboard.html");
 });
 
-app.post('/', upload.single('video-file'), function (req, res, next) {
+app.post('/start-job', function (req, res){
+    console.log("Job starting...");
+    console.log(req.body);
+    res.sendStatus(200);
+});
+
+app.post('/create-job', upload.single('video-file'), function (req, res, next) {
     console.log("Incoming job:");
     console.log(req.body);
     console.log(req.file);
