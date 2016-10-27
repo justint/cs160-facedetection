@@ -91,7 +91,7 @@ $(document).on('click', "#start-job-button", function() {
     $.ajax({
       url: "/start-job",
       method: "POST",
-      data: { num: jobNum }
+      data: { "job-number": jobNum }
     })
       .done(function(e) {
         alert("Job started: " + e);
