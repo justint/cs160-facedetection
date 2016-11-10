@@ -28,8 +28,11 @@ coverage
 build/Release
 
 # Dependency directories
-node_modules
+node_modules/*
 jspm_packages
+
+# Include our written JS files
+!node_modules/*.js
 
 # Optional npm cache directory
 .npm
