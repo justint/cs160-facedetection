@@ -40,8 +40,8 @@ router.get("/dashboard", function(req,res){
 // Handle when user starts a job
 app.post('/start-job', function (req, res){
 
-    console.log("Job starting...");
-    console.log(req.body);
+    console.log("Job " + req.body['job-number']  + " starting...");
+    //console.log(req.body);
     console.log("\n");
 
     //Start job pipeline
@@ -71,6 +71,7 @@ app.post('/create-job', upload.single('video-file'), function (req, res, next) {
 app.use('/css',express.static(__dirname+'/css'));
 app.use('/js',express.static(__dirname+'/js'));
 app.use('/img',express.static(__dirname+'/img'));
+app.use('/templates',express.static(__dirname+'/views/templates'));
 
 app.use("/",router);
 

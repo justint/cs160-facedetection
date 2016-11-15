@@ -34,7 +34,7 @@ Also, press `j` in the browser to see a sample "completed job" notification.
   - [ ] Store job info into Postgres
 
 - Handle job initialization:
-  - [ ] Call script which continues pipeline:
+  - [x] Call script which continues pipeline: (see Node.js [child_process](https://nodejs.org/api/child_process.html) docs for details on this)
       - FFMPEG for frame splitting
       - Process frames via OpenFace
       - Draw OpenCV implementation
@@ -47,7 +47,7 @@ Also, press `j` in the browser to see a sample "completed job" notification.
 
 ### Should do (code cleanup):
 
-- [ ] Rewrite Job queueing jQuery actions to load templated HTML instead of injecting HTML block snippets (use .parent to find proper job num)
+- [x] Rewrite Job queueing jQuery actions to load templated HTML instead of injecting HTML block snippets (use .parent to find proper job num, use jQuery .load())
 - [ ] Re-write Job.js to be a class
 
 ### Want to do:

@@ -57,36 +57,43 @@ $("#video-submit").submit(function(e) {
   // Update form job number
   form.elements["job-number"].value = jobCount;
 
-  // Produce awful html blocks for new job
-  var preFilename = "<div class=\"job new-job panel panel-default\"><table class=\"job\"><tr><td class=\"job-thumbnail\"><img data-src=\"holder.js/200x200\" class=\"job img-thumbnail\" alt=\"100x100\" src=\"img/thumbnail.gif\" data-holder-rendered=\"true\"></td><td class=\"job-body\"><table class=\"job job-body\"><tr><td class=\"job-name\">";
-  var preJobId = "</td><td class=\"job-num\">";
-  var preFilesize = "</td></tr><tr><td>Filesize: ";
-  var preSubmitDateTime = " bytes</td></tr><tr><td>Submit time: ";
-  var preStatus ="</td></tr><tr><td>Status: ";
-  var rest = "</td><td class=\"job-buttons\"><button id=\"start-job-button\">Start job</button></td></tr></table></td></tr></table></div>";
-
-  // Concatenate this ugly disgusting new job
-  var newJobHTML = preFilename + jobData.filename + preJobId + jobData.jobNum +
-    preFilesize + jobData.filesize + preSubmitDateTime + jobData.submitDateTime +
-    preStatus + jobData.status + rest;
-
   form.submit();
 
   // Add job to job-list
-  $('.job-list').append( newJobHTML );
-  $('.new-job').slideDown("fast");
-  $('.new-job').animate({"opacity": "1", "marginTop": 0}, 500);
+  $('.job-list').append($("<div class=\"job-" + jobData.jobNum + "\"/>").load( "/templates/job.html", function() {
 
-  // Hide add-job panel
-  $("#new-job-panel").animate({
-    "opacity": 0,
-    "margin-top": "100px"
-  }, 500 );
+    // Fill template HTML with data using jQuery.loadTemplate
+    $.getScript('/js/jquery.loadTemplate.min.js', function()
+    {
+        $(".job-" + jobData.jobNum).loadTemplate($("#template"),
+      {
+          jobName: jobData.filename,
+          jobNum: jobCount,
+          filesize: formatBytes(jobData.filesize, 2),
+          submit_time: jobData.submitDateTime,
+          status: jobData.status,
+          thumbnail: "/img/thumbnail.gif"
+      }, { success: function() {
+        // Executed after template is filled -- animates job entrance
+        $('.new-job').slideDown("fast");
+        $('.new-job').animate({"opacity": "1", "marginTop": 0}, 500);
+
+          // Hide add-job panel
+          $("#new-job-panel").animate({
+            "opacity": 0,
+            "margin-top": "100px"
+          }, 500 );
+        }
+      });
+    });
+  }));
+
 
 });
 
-$(document).on('click', "#start-job-button", function() {
-    var jobNum = $(".job-num")[0].textContent;
+// Start job button handler
+$(document).on('click', ".start-job-button", function(e) {
+    var jobNum = e.currentTarget.id;
 
     $.ajax({
       url: "/start-job",
@@ -97,3 +104,13 @@ $(document).on('click', "#start-job-button", function() {
         alert("Job started: " + e);
     });
 });
+
+// Used in job filesize formatting
+function formatBytes(bytes,decimals) {
+   if(bytes == 0) return '0 Byte';
+   var k = 1000; // or 1024 for binary
+   var dm = decimals + 1 || 3;
+   var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+   var i = Math.floor(Math.log(bytes) / Math.log(k));
+   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
