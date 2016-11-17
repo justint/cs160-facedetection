@@ -1,6 +1,6 @@
 var jobCount = 0;
 
-// Display new job panel
+// Handler for new job button below job list -- displays new job panel
 $( "#add-job" ).click(function() {
   $("#new-job-panel").removeClass("hide");
   $("#new-job-panel").animate({
@@ -25,7 +25,16 @@ function errorFiletype() {
   $('#alert-improperfiletype').animate({"opacity": 1}, 500);
 }
 
-// New job submission function
+/* Handler for submitting/queueing a new job.
+ *
+ * Performs the following steps:
+ * 1. Halts the default form operation (prevents premature submission).
+ * 2. Grabs the video + video filetype.
+ * 3. Verifies submitted file is indeed a video
+ * 4. Hides "No jobs queued..." message, increments job count
+ * 5. Grabs video metadata, sends metadata + file to server
+ * 6. Adds job to UI job list
+ */
 $("#video-submit").submit(function(e) {
   e.preventDefault();
 
@@ -57,41 +66,54 @@ $("#video-submit").submit(function(e) {
   // Update form job number
   form.elements["job-number"].value = jobCount;
 
+  // Send form data to server
   form.submit();
 
-  // Add job to job-list
+  /* The following block of code performs these important functions:
+   * 1. Loads the jquery-template plugin
+   * 2. Spits out a filled template in a newly appended job div (see line above)
+   * 3. Displays/animates the job being added to the job list
+   */
   $('.job-list').append($("<div class=\"job-" + jobData.jobNum + "\"/>").load( "/templates/job.html", function() {
-
-    // Fill template HTML with data using jQuery.loadTemplate
     $.getScript('/js/jquery.loadTemplate.min.js', function()
     {
         $(".job-" + jobData.jobNum).loadTemplate($("#template"),
-      {
-          jobName: jobData.filename,
-          jobNum: jobCount,
-          filesize: formatBytes(jobData.filesize, 2),
-          submit_time: jobData.submitDateTime,
-          status: jobData.status,
-          thumbnail: "/img/thumbnail.gif"
-      }, { success: function() {
-        // Executed after template is filled -- animates job entrance
-        $('.new-job').slideDown("fast");
-        $('.new-job').animate({"opacity": "1", "marginTop": 0}, 500);
+        {
+            jobName: jobData.filename,
+            jobNum: jobCount,
+            filesize: formatBytes(jobData.filesize, 2),
+            submit_time: jobData.submitDateTime,
+            status: jobData.status,
+            thumbnail: "/img/thumbnail.gif"
+          }, { success: function() {
+            // Executed after template is filled -- animates job entrance
+            $('.new-job').slideDown("fast");
+            $('.new-job').animate({"opacity": "1", "marginTop": 0}, 500);
 
-          // Hide add-job panel
-          $("#new-job-panel").animate({
-            "opacity": 0,
-            "margin-top": "100px"
-          }, 500 );
-        }
-      });
+              // Hide add-job panel
+              $("#new-job-panel").animate({
+                "opacity": 0,
+                "margin-top": "100px"
+              }, 500 );
+            }
+        });
     });
   }));
-
-
 });
 
-// Start job button handler
+// Used in job filesize formatting
+function formatBytes(bytes, decimals) {
+   if(bytes == 0) return '0 bytes';
+   var k = 1000; // or 1024 for binary
+   var dm = decimals + 1 || 3;
+   var sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+   var i = Math.floor(Math.log(bytes) / Math.log(k));
+   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+/* Handler for the Start Job button in a given Job.
+ * Will send an AJAX POST request to the server to begin pipeline execution.
+ */
 $(document).on('click', ".start-job-button", function(e) {
     var jobNum = e.currentTarget.id;
 
@@ -104,13 +126,3 @@ $(document).on('click', ".start-job-button", function(e) {
         alert("Job started: " + e);
     });
 });
-
-// Used in job filesize formatting
-function formatBytes(bytes,decimals) {
-   if(bytes == 0) return '0 Byte';
-   var k = 1000; // or 1024 for binary
-   var dm = decimals + 1 || 3;
-   var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-   var i = Math.floor(Math.log(bytes) / Math.log(k));
-   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-}
