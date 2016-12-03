@@ -49,6 +49,8 @@ Also, press `j` in the browser to see a sample "completed job" notification.
 
 - [x] Rewrite Job queueing jQuery actions to load templated HTML instead of injecting HTML block snippets (use .parent to find proper job num, use jQuery .load())
 - [ ] Re-write Job.js to be a class
+- [ ] Have interface load what jobs are in current user's queue on page load
+- [ ] Large files take time to upload. Unfortunately, the client-side automatically adds the job to the UI list before it knows if the file is uploaded, possibly causing errors. I'll need to modify the templated HTML to have the button disabled by default, and have a loop on the client-side to ping the server periodically if the job file is uploaded. Once the server begins processing the file (app.post('/create-job'...) ), the server will return that request with a truthy value, indicating the file is fully uploaded.
 
 ### Want to do:
 

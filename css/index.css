@@ -87,6 +87,51 @@ div.job {
   transition: all 0.3s ease 0s;
 }
 
+.job-processing {
+  padding-left: 5px;
+  color: #ccc;
+  transition: all 0.3s ease 0s;
+
+  -webkit-animation: spin 2s infinite linear;
+  -moz-animation: spin 2s infinite linear;
+  -o-animation: spin 2s infinite linear;
+  animation: spin 2s infinite linear;
+}
+@-moz-keyframes spin {
+  0% {
+    -moz-transform: rotate(0deg);
+  }
+  100% {
+    -moz-transform: rotate(359deg);
+  }
+}
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+  }
+}
+@-o-keyframes spin {
+  0% {
+    -o-transform: rotate(0deg);
+  }
+  100% {
+    -o-transform: rotate(359deg);
+  }
+}
+@keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg);
+  }
+}
+
 /* Newly added job, for fade-in animation */
 div.new-job {
   opacity: 0;
@@ -104,4 +149,10 @@ div.new-job {
   bottom: 0;
   padding-bottom: 15px;
   width: 100%;
+}
+
+#dead_iframe {
+  height: 0;
+  width: 0;
+  border: 0;
 }

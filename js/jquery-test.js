@@ -1,5 +1,10 @@
 var jobCount = 0;
 
+var strings = {
+  uploading : "uploading...",
+  ready_to_start : "ready to start"
+}
+
 // Handler for new job button below job list -- displays new job panel
 $( "#add-job" ).click(function() {
   $("#new-job-panel").removeClass("hide");
@@ -17,7 +22,7 @@ $(document).keypress(
     if (event.key == 'j') {
       $('.notification-area').append("<div class=\"alert alert-success alert-dismissable\" id=\"test-alert\" role=\"alert\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button><strong>Job complete!</strong> Job 4 has completed with <strong>0</strong> errors.</div>");
       $('#test-alert').animate({"opacity": 1}, 500);
-    }});
+}});
 
 // Error message for bad filetype upload
 function errorFiletype() {
@@ -50,9 +55,6 @@ $("#video-submit").submit(function(e) {
     return;
   }
 
-  // Hide no-job text
-  if (jobCount == 0) $('.no-job-text').animate({"opacity": "0"}, 700).detach();
-
   jobCount++;
 
   var jobData = {
@@ -60,7 +62,7 @@ $("#video-submit").submit(function(e) {
     jobNum: jobCount,
     filesize: video.files[0].size,
     submitDateTime: new Date(),
-    status: "waiting to start"
+    status: "uploading..."
   }
 
   // Update form job number
@@ -69,6 +71,67 @@ $("#video-submit").submit(function(e) {
   // Send form data to server
   form.submit();
 
+  addJobToJobList(jobData);
+
+  serverListener(jobData);
+
+  // Show job processing icon
+  /*
+  var jobProcessingIcon = '<div class="job-processing"><span class="job-processing job-processing-icon glyphicon glyphicon-repeat" aria-hidden="true"> </span></div>';
+  $('.job-list').append($(jobProcessingIcon));
+  jobProcessingIcon = $(jobProcessingIcon);
+  $('.job-processing').animate({"opacity": "1"}, 500);
+  */
+
+});
+
+function serverListener(jobData) {
+    var timeout = 1000;
+
+    console.log("Starting server listener");
+
+    var ping = setInterval(function() {
+
+      var iframeServerResponse = $('iframe')["0"].contentDocument.documentElement.innerText;
+      if (iframeServerResponse.localeCompare("") != 0)
+      {
+        iframeServerResponse = JSON.parse(iframeServerResponse);
+        if (iframeServerResponse.error)
+        {
+          switch(iframeServerResponse.error)
+          {
+            case "errorFiletype":
+              console.log("Filetype error, displaying error message");
+              // Hide job-processing icon
+              $('.job-processing-icon').animate({"opacity": "0"}, 500).detach();
+              errorFiletype();
+              break;
+            default:
+              break;
+          }
+          clearInterval(ping);
+
+          jobCount--;
+
+          // Empty iframe to prep for future incoming server responses
+          document.getElementById('dead_iframe').src = "about:blank";
+          //document.getElementById('dead_iframe').contentWindow.location.reload();
+        }
+      }
+
+      $.post("/add-job", jobData, 'json')
+        .done(function() {
+          console.log("Job " + jobData.jobNum + " file uploaded");
+          clearInterval(ping);
+          // Enable button, hide processing icon, update status text, dear god this is ugly
+          $("td[class='job-num']:contains(" + jobData.jobNum + ")")[0].parentElement.parentElement.querySelector("button").disabled = false;
+          $("td[class='job-num']:contains(" + jobData.jobNum + ")")[0].parentElement.parentElement.querySelector(".job-processing-icon").style.visibility = "hidden";
+          $("td[class='job-num']:contains(" + jobData.jobNum + ")")[0].parentElement.parentElement.querySelector("#job-status").innerHTML = strings.ready_to_start;
+      });
+    }, timeout);
+}
+
+function addJobToJobList(jobData) {
   /* The following block of code performs these important functions:
    * 1. Loads the jquery-template plugin
    * 2. Spits out a filled template in a newly appended job div (see line above)
@@ -95,11 +158,19 @@ $("#video-submit").submit(function(e) {
                 "opacity": 0,
                 "margin-top": "100px"
               }, 500 );
+
+              // Hide no-job text
+              // jobCount check is 1 because jobNum is incremented before this
+              // parent function. Essentially 1 == no jobs yet, 2 == one job, etc
+              if (jobCount == 1) $('.no-job-text').animate({"opacity": "0"}, 700).detach();
+
+              // Hide job-processing icon
+              //$('.job-processing-icon').animate({"opacity": "0"}, 500).detach();
             }
         });
     });
   }));
-});
+}
 
 // Used in job filesize formatting
 function formatBytes(bytes, decimals) {
@@ -125,4 +196,11 @@ $(document).on('click', ".start-job-button", function(e) {
       .done(function(e) {
         alert("Job started: " + e);
     });
+});
+
+/* Handler for loading jobs in the job list.
+ *
+ */
+$(document).ready(function() {
+
 });
