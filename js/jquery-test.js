@@ -316,7 +316,7 @@ function jobExecListener(jobNum) {
 }
 
 /* Handler for loading jobs in the job list.
- *
+ * 
  */
 $(document).ready(function() {
 
