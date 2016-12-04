@@ -19,7 +19,8 @@
   width: 100%;
 }
 
-#test-alert {
+/* Set all alerts to initally be hidden */
+div[id^='alert-'] {
   opacity: 0;
 }
 

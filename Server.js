@@ -3,6 +3,7 @@ var express = require("express");
 var multer = require("multer");
 var bodyParser = require('body-parser');
 var repl = require("repl");
+var fs = require("fs");
 
 // Import our code
 var Job = require("./lib/Job.js");
@@ -79,36 +80,85 @@ app.post('/create-job', upload.single('video-file'), function (req, res, next) {
     clearShell();
 });
 
-app.post('/add-job', function(req, res) {
-  console.log("Incoming client ping for Job " + req.body.jobNum + "...");
-  if (jobList[req.body.jobNum - 1] != null)
+// Client ping handler
+app.post("/job-status", function(req, res){
+  console.log("Incoming client ping type " + req.body.pingType + " for Job " + req.body.jobNum);
+  switch(parseInt(req.body.pingType))
   {
-    console.log("File upload complete, adding to client job list...");
-    res.status(200).send(req.body.jobNum);
+    case 0: // Upload status
+    {
+      if (jobList[req.body.jobNum - 1] != null)
+      {
+        console.log("File upload complete, adding to client job list...");
+        res.status(200).send(req.body.jobNum);
+      }
+      break;
+    }
+    case 1: // Processing status
+    {
+      if (jobList[req.body.jobNum - 1].complete) {
+        console.log("Sending job complete status...");
+        res.send(true);
+      }
+      else res.send(false);
+      break;
+    }
+    default: // Improper ping type
+    {
+      break;
+    }
   }
   clearShell();
 });
 
 // Serve static content
-app.use('/css',express.static(__dirname+'/css'));
-app.use('/js',express.static(__dirname+'/js'));
-app.use('/img',express.static(__dirname+'/img'));
-app.use('/templates',express.static(__dirname+'/views/templates'));
+app.use('/css', express.static(__dirname+'/css'));
+app.use('/js', express.static(__dirname+'/js'));
+app.use('/img', express.static(__dirname+'/img'));
+app.use('/templates', express.static(__dirname+'/views/templates'));
 
-app.use("/",router);
+app.use("/", router);
 
 // Handle 404 errors
-app.use("*",function(req,res){
+app.use("*", function(req, res) {
   res.sendFile(path + "404.html");
 });
 
-app.listen(3000,function(){
+app.listen(3000, function() {
   console.log("Live at Port 3000");
   console.log("");
-  // Initialize + clear shell
-  repl.start("160-pipeline> ").context.jobList = jobList;;
+
+  // Initialize shell
+  var replServer = repl.start("160-pipeline> ");
+
+  // Make jobList accessible to shell
+  replServer.context.jobList = jobList;
+
+  // Define .shutdown command
+  /*
+  replServer.defineCommand('shutdown', {
+    help: 'Shuts down server gracefully',
+    action: function() {
+      this.lineParser.reset();
+      this.bufferedCommand = '';
+
+      safeShutdown();
+    }
+  });
+  */
+
+  // Handle Cntl-C quits
+  replServer.on('exit', safeShutdown);
+
 });
 
 function clearShell() {
   process.stdout.write("160-pipeline> ");
+}
+
+function safeShutdown() {
+  jobList = JSON.stringify(jobList);
+  fs.writeFileSync('jobList.txt', jobList);
+  console.log('Successfully saved job data to file');
+  process.exit();
 }

@@ -1,51 +1,114 @@
+/**
+ * Stores local copy of user's job queue count.
+ *
+ *  TODO: load this number (along with queue) at page load
+ */
 var jobCount = 0;
 
+/* Stores strings used in job statuses. */
 var strings = {
   uploading : "uploading...",
-  ready_to_start : "ready to start"
+  ready_to_start : "ready to start",
+  processing : "processing...",
+  done : "job complete"
 }
 
-// Handler for new job button below job list -- displays new job panel
+/* Handler for new job button below job list, displays new job panel. */
 $( "#add-job" ).click(function() {
   $("#new-job-panel").removeClass("hide");
   $("#new-job-panel").animate({
     "margin-top" : 0,
     "opacity": 1
   }, 500 );
-
 });
 
+/**
+ * Pseudo-enums for different types of alerts generated using genJobAlert().
+ *
+ * Passed into genJobAlert(alertType) from jobExecListener().
+ */
+var Alerts = {
+  DANGER : 0,
+  SUCCESS : 1,
+  INFO : 2,
+  WARNING : 3
+}
 
-// Debug job complete notification
-$(document).keypress(
-  function(event) {
-    if (event.key == 'j') {
-      $('.notification-area').append("<div class=\"alert alert-success alert-dismissable\" id=\"test-alert\" role=\"alert\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button><strong>Job complete!</strong> Job 4 has completed with <strong>0</strong> errors.</div>");
-      $('#test-alert').animate({"opacity": 1}, 500);
-}});
+/**
+ * Produces job-related alerts and injects them into the page.
+ *
+ *  alertType: one of the pseudo-enums from the Alerts var
+ *  jobData: array of data about the job
+ */
+function genJobAlert(alertType, jobData) {
+  switch(alertType)
+  {
+    case Alerts.SUCCESS:
+    {
+      // Inject templated html, fill data using loadTemplate script, display
+      $('.notification-area').append($("<div class=\"alert-success-job-" + jobData.jobNum + "\"/>").load( "/templates/notification_success.html", function() {
+        $.getScript('/js/jquery.loadTemplate.min.js', function()
+        {
+            $(".alert-success-job-" + jobData.jobNum).loadTemplate($("#template"),
+            {
+                jobNum: jobCount
+              }, { success: function() { // Executed after template is filled
+                $(".alert-success-job-" + jobData.jobNum).animate({"opacity": 1}, 500);
+              }
+            }
+          )
+        });
+      }));
+      break;
+    }
+    case Alerts.WARNING:
+    {
+      // TODO
+      break;
+    }
+    case Alerts.DANGER:
+    {
+      // TODO
+      break;
+    }
+    case Alerts.INFO:
+    {
+      // TODO
+      break;
+    }
+  }
 
-// Error message for bad filetype upload
+}
+
+/**
+ * Alert displayer for bad uploaded filetypes.
+ *
+ * Is called for both client-side and server-side responses.
+ */
 function errorFiletype() {
   $('.notification-area').append("<div class=\"alert alert-warning alert-dismissable\" id=\"alert-improperfiletype\" role=\"alert\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button><strong>Improper filetype!</strong> The file you selected for upload is not a video. Please upload a video file.</div>");
   $('#alert-improperfiletype').animate({"opacity": 1}, 500);
 }
 
-/* Handler for submitting/queueing a new job.
+/**
+ * Handler for pressing the Queue job button.
  *
  * Performs the following steps:
- * 1. Halts the default form operation (prevents premature submission).
- * 2. Grabs the video + video filetype.
- * 3. Verifies submitted file is indeed a video
- * 4. Hides "No jobs queued..." message, increments job count
- * 5. Grabs video metadata, sends metadata + file to server
- * 6. Adds job to UI job list
+ *  1. Halts the default form operation (prevents premature submission).
+ *  2. Grabs the video + video filetype.
+ *  3. Verifies submitted file is indeed a video
+ *  4. Increments client-side job count
+ *  5. Creates jobData array
+ *  6. Grabs video metadata, sends metadata + file to server
+ *  7. Adds job to UI job list
  */
 $("#video-submit").submit(function(e) {
+  // Prevent default form operation
   e.preventDefault();
 
   var form = this;
-  var video = form.elements["video-file"];
 
+  var video = form.elements["video-file"];
   var videoType = form.elements["video-file"].files[0].type;
 
   // Verify video mimetype, throw error if invalid
@@ -62,7 +125,8 @@ $("#video-submit").submit(function(e) {
     jobNum: jobCount,
     filesize: video.files[0].size,
     submitDateTime: new Date(),
-    status: "uploading..."
+    status: "uploading...",
+    pingType: 0
   }
 
   // Update form job number
@@ -73,22 +137,27 @@ $("#video-submit").submit(function(e) {
 
   addJobToJobList(jobData);
 
-  serverListener(jobData);
-
-  // Show job processing icon
-  /*
-  var jobProcessingIcon = '<div class="job-processing"><span class="job-processing job-processing-icon glyphicon glyphicon-repeat" aria-hidden="true"> </span></div>';
-  $('.job-list').append($(jobProcessingIcon));
-  jobProcessingIcon = $(jobProcessingIcon);
-  $('.job-processing').animate({"opacity": "1"}, 500);
-  */
-
+  // Start listener for file upload status
+  uploadListener(jobData);
 });
 
-function serverListener(jobData) {
+/**
+ * A listener to check the status of a job file upload by pinging the server.
+ *
+ * Has a timeout variable to control length between each ping to the server for
+ * information.
+ *
+ * In each ping, it first checks the dead_iframe on current page for error
+ * information passed from the server, and handles accordingly. If no error,
+ * moves along to the POST call. If call is successful, cancels ping and
+ * updates job's visual status elements (status text, button, etc).
+ *
+ * jobData: array of data about the job
+ */
+function uploadListener(jobData) {
     var timeout = 1000;
 
-    console.log("Starting server listener");
+    console.log("Starting uploadListener...");
 
     var ping = setInterval(function() {
 
@@ -103,7 +172,9 @@ function serverListener(jobData) {
             case "errorFiletype":
               console.log("Filetype error, displaying error message");
               // Hide job-processing icon
-              $('.job-processing-icon').animate({"opacity": "0"}, 500).detach();
+              var jobProcessingIcon = $("td[class='job-num']:contains(" + jobData.jobNum + ")")[0].parentElement.parentElement.querySelector(".job-processing-icon");
+              jobProcessingIcon = $(jobProcessingIcon);
+              jobProcessingIcon.animate({"opacity": "0"}, 500);
               errorFiletype();
               break;
             default:
@@ -119,24 +190,34 @@ function serverListener(jobData) {
         }
       }
 
-      $.post("/add-job", jobData, 'json')
+      console.log("Pinging server about upload status on job " + jobData.jobNum);
+      $.post("/job-status", jobData, 'json')
         .done(function() {
-          console.log("Job " + jobData.jobNum + " file uploaded");
+          console.log("Job " + jobData.jobNum + " file uploaded, stopping uploadListener");
           clearInterval(ping);
           // Enable button, hide processing icon, update status text, dear god this is ugly
           $("td[class='job-num']:contains(" + jobData.jobNum + ")")[0].parentElement.parentElement.querySelector("button").disabled = false;
-          $("td[class='job-num']:contains(" + jobData.jobNum + ")")[0].parentElement.parentElement.querySelector(".job-processing-icon").style.visibility = "hidden";
+
+          var jobProcessingIcon = $("td[class='job-num']:contains(" + jobData.jobNum + ")")[0].parentElement.parentElement.querySelector(".job-processing-icon");
+          jobProcessingIcon = $(jobProcessingIcon);
+          jobProcessingIcon.animate({"opacity": "0"}, 500);
+
           $("td[class='job-num']:contains(" + jobData.jobNum + ")")[0].parentElement.parentElement.querySelector("#job-status").innerHTML = strings.ready_to_start;
       });
     }, timeout);
 }
 
+/**
+ * Adds given job to the client-side job list.
+ *
+ * Targets the job-list, appends a loaded templated html file in a new div, uses
+ * the jquery-template script to target that new div and fill in the loaded
+ * template, and then animates the job entrance + hides add-job panel and no-job
+ * text.
+ *
+ *  jobData: array of data about the job
+ */
 function addJobToJobList(jobData) {
-  /* The following block of code performs these important functions:
-   * 1. Loads the jquery-template plugin
-   * 2. Spits out a filled template in a newly appended job div (see line above)
-   * 3. Displays/animates the job being added to the job list
-   */
   $('.job-list').append($("<div class=\"job-" + jobData.jobNum + "\"/>").load( "/templates/job.html", function() {
     $.getScript('/js/jquery.loadTemplate.min.js', function()
     {
@@ -194,9 +275,45 @@ $(document).on('click', ".start-job-button", function(e) {
       data: { "job-number": jobNum }
     })
       .done(function(e) {
-        alert("Job started: " + e);
+        $("td[class='job-num']:contains(" + jobNum + ")")[0].parentElement.parentElement.querySelector("button").disabled = true;
+        var jobProcessingIcon = $("td[class='job-num']:contains(" + jobNum + ")")[0].parentElement.parentElement.querySelector(".job-processing-icon");
+        jobProcessingIcon = $(jobProcessingIcon);
+        jobProcessingIcon.animate({"opacity": "1"}, 500);
+        $("td[class='job-num']:contains(" + jobNum + ")")[0].parentElement.parentElement.querySelector("#job-status").innerHTML = strings.processing;
+        jobExecListener(jobNum);
     });
 });
+
+function jobExecListener(jobNum) {
+   var timeout = 5000;
+
+   console.log("Starting jobExecListener...");
+   var ping = setInterval(function() {
+     $.ajax({
+       url: "/job-status",
+       method: "POST",
+       data: {
+         "jobNum" : jobNum,
+         "pingType" : 1
+        }
+     })
+      .done(function(e) {
+        if (e) // Job is done
+        {
+          console.log("Job " + jobNum + " done, stopping jobExecListener");
+          clearInterval(ping);
+          var jobProcessingIcon = $("td[class='job-num']:contains(" + jobNum + ")")[0].parentElement.parentElement.querySelector(".job-processing-icon");
+          jobProcessingIcon = $(jobProcessingIcon);
+          jobProcessingIcon.animate({"opacity": "0"}, 500);
+          $("td[class='job-num']:contains(" + jobNum + ")")[0].parentElement.parentElement.querySelector("#job-status").innerHTML = strings.done;
+
+          // Todo: return actual set of job complete data (errors, etc)
+          genJobAlert(Alerts.SUCCESS, { "jobNum" : jobNum });
+          // Turn start job button into download button
+        }
+    });
+  }, timeout);
+}
 
 /* Handler for loading jobs in the job list.
  *
