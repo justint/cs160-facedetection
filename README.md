@@ -8,9 +8,15 @@ Install the required modules:
 
 ## Running
 
+Create + initialize Postgres:
+
+`$ server-sh-scripts/startpsql.sh`
+
+`$ server-sh-scripts/createdb.sh`
+
 Initialize the server:
 
-`$ node Server.js`
+`$ node Server-dan.js`
 
 >Initializing server...
 
@@ -34,11 +40,11 @@ Ta-da! Now navigate your browser to `127.0.0.1:3000`.
 ### Must do:
 
 - Handle job creation:
-  - [ ] Implement file sanitation on server-side
+  - [x] Implement file sanitation on server-side
     - [x] Check file mimetype on server-side
   - [ ] Store job info into Postgres
 
-- [ ] Store and load user queues to file (for server restarts/etc)
+- [ ] Store and load user queues to/from database
 
 - Handle job initialization:
   - [x] Call script which continues pipeline: (see Node.js [child_process](https://nodejs.org/api/child_process.html) docs for details on this)
@@ -54,6 +60,9 @@ Ta-da! Now navigate your browser to `127.0.0.1:3000`.
 
 ### Should do (code cleanup):
 
+- [ ] Finish commenting jquery-test.js, rename it to something proper
+- [ ] Convert status text changes and job processing icon show/hides (client-side) into separate functions ( setStatus(statusText), jobIconVisibility(true/false) )
+- [ ] Convert jobStatus integers (server-side) into pseudo-enums
 - [x] Rewrite Job queueing jQuery actions to load templated HTML instead of injecting HTML block snippets (use .parent to find proper job num, use jQuery .load())
 - [ ] Re-write Job.js to be a class
 - [ ] Have interface load what jobs are in current user's queue list on page load
@@ -62,8 +71,8 @@ Ta-da! Now navigate your browser to `127.0.0.1:3000`.
 ### Want to do:
 
 - [ ] Implement progress bar in web interface for each pipeline step
-- [ ] Support FBX file output from tracked face animation
-  - Support files: [rigged face](http://www.turbosquid.com/FullPreview/Index.cfm/ID/341150)
+- [ ] ~~Support FBX file output from tracked face animation~~
+  - ~~Support files: [rigged face](http://www.turbosquid.com/FullPreview/Index.cfm/ID/341150)~~
 
 
 # OpenFace notes

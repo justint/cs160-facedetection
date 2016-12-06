@@ -1,0 +1,12 @@
+Install:
+brew install postgresql
+
+start postgres:
+./startpsql.sh
+
+create database:
+./createdb.sh
+
+Added GetJobs route
+Added insertdb function, called inside of /create-job route
+added updateJobStatus function

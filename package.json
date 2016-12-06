@@ -7,6 +7,7 @@
   "dependencies" : {
     "express" : "latest",
     "multer" : "latest",
-    "body-parser" : "latest"
+    "body-parser" : "latest",
+    "pg" : "latest"
   }
 }
