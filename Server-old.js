@@ -4,8 +4,7 @@ var multer = require("multer");
 var bodyParser = require('body-parser');
 var repl = require("repl");
 var fs = require("fs");
-const pg = require('pg');
-const connectionString = process.env.DATABASE_URL || 'postgres://localhost:5432/faceservice';
+
 // Import our code
 var Job = require("./lib/Job.js");
 
@@ -20,8 +19,6 @@ console.log("Initializing server...");
 
 // Initialize empty list of jobs
 var jobList = [];
-var userid = 1;
-
 
 // Enable body-parser for JSON parsing
 app.use(bodyParser.json());
@@ -35,7 +32,6 @@ router.use(function (req,res,next) {
 });
 
 router.get("/", function(req,res){
-
   res.sendFile(path + "index.html");
 });
 
@@ -44,11 +40,8 @@ router.get("/stats", function(req,res){
 });
 
 router.get("/dashboard", function(req,res){
-  //updateJobStatus(userid,1, 3);
   res.sendFile(path + "dashboard.html");
 });
-
-
 
 // Handle when user starts a job
 app.post('/start-job', function (req, res){
@@ -58,8 +51,6 @@ app.post('/start-job', function (req, res){
 
     //Start job pipeline
     jobList[ req.body['job-number'] - 1 ].execute( req.body['job-number'] );
-
-    updateJobStatus(req.body['ownerid'], req.body['job-number'], 1);
 
     // Send success status to client
     res.sendStatus(200);
@@ -80,128 +71,14 @@ app.post('/create-job', upload.single('video-file'), function (req, res, next) {
     else
     {
       // Create new job, add to job list
-      //TODO: pass in actual job data
       var newJob = new Job(req.body['job-number']);
-      var status = 0;
       jobList.push(newJob);
-
-      insertdb(
-        userid,
-        req.body['cv-implementation'],
-        req.file['fieldname'],
-        req.body['job-number'],
-        req.file['originalname'],
-        req.file['encoding'],
-        req.file['mimetype'],
-        req.file['destination'],
-        req.file['filename'],
-        req.file['path'],
-        req.file['size'],
-        status
-      );
 
       // Send success status to client
       res.status(200).send();
     }
     clearShell();
-
-
-
 });
-
-// Get a list of jobs for a user
-router.get('/getjobs:ownerid', (req, res, next) => {
-  const results = [];
-  // Get a Postgres client from the connection pool
-  pg.connect(connectionString, (err, client, done) => {
-    // Handle connection errors
-    if(err) {
-      done();
-      console.log(err);
-      return res.status(500).json({success: false, data: err});
-    }
-    // SQL Query > Select Data
-    const query = client.query('SELECT * FROM jobs WHERE ownerid=($1);');
-    // Stream results back one row at a time
-    query.on('row', (row) => {
-      results.push(row);
-    });
-    // After all data is returned, close connection and return results
-    query.on('end', () => {
-      done();
-      return res.json(results);
-    });
-  });
-});
-
-//update a job's status
-function updateJobStatus(ownerid, jobnumber, status) {
-
-  // Get a Postgres client from the connection pool
-  pg.connect(connectionString, (err, client, done) => {
-    // Handle connection errors
-    if(err) {
-      done();
-      console.log(err);
-    }
-    // SQL Query > Update Data
-    client.query('UPDATE jobs SET status=($3) WHERE ownerid=($1) AND jobnumber=($2)',
-    [ownerid, jobnumber, status]);
-  });
-};
-
-/*
-  returns a list of jobs for a user
-*/
-function getJobs(ownerid) {
-
-  var results = [];
-
-  // Get a Postgres client from the connection pool
-  pg.connect(connectionString, (err, client, done) => {
-    // Handle connection errors
-    if(err) {
-      done();
-      console.log(err);
-    }
-    // SQL Query > Select Data
-    const query = client.query('SELECT * FROM jobs WHERE ownerid=(' + ownerid + ');');
-    // Stream results back one row at a time
-    query.on('row', (row) => {
-      console.log("row: " + row);
-      results.push(row);
-    });
-    // After all data is returned, close connection and return results
-    query.on('end', () => {
-      done();
-      console.log("return results");
-      return results;
-    });
-  });
-
-}
-
-/*
-  inserts a job into database
-*/
-function insertdb(ownerid, cvimplementation, fieldname, jobnumber, originalname, encoding, mimetype, destination, filename, path, size, status) {
-
-  pg.connect(connectionString, (err, client, done) => {
-    // Handle connection errors
-    if(err) {
-      done();
-      console.log(err);
-
-    }
-    // SQL Query > Insert Data
-    client.query('INSERT INTO jobs(ownerid, cvimplementation, fieldname,' +
-    ' jobnumber, originalname, encoding, mimetype, destination, filename, path, size, status)' +
-    ' values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)',
-    [ownerid, cvimplementation, fieldname, jobnumber, originalname, encoding, mimetype, destination, filename, path, size, status]);
-
-  });
-
-}
 
 // Client ping handler
 app.post("/job-status", function(req, res){
@@ -280,6 +157,8 @@ function clearShell() {
 }
 
 function safeShutdown() {
+  jobList = JSON.stringify(jobList);
+  fs.writeFileSync('jobList.txt', jobList);
   console.log('Successfully saved job data to file');
   process.exit();
 }

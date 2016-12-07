@@ -1,6 +1,7 @@
 #!/bin/sh
 
 psql faceservice $USER << EOF
-SELECT * FROM jobs WHERE ownerid = 1;
+SELECT * FROM jobs;
+SELECT * FROM users;
 EOF
 exit 0;

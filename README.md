@@ -39,10 +39,17 @@ Ta-da! Now navigate your browser to `127.0.0.1:3000`.
 
 ### Must do:
 
+
+- [ ] Load jobs from ownerid on dashboard.ejs load (client-side request to server)
+
+- [ ] Validate email input on signup.ejs
+
+- [ ] Update index.ejs to include local reg + proj name/our team, remove Facebook 
+
 - Handle job creation:
   - [x] Implement file sanitation on server-side
     - [x] Check file mimetype on server-side
-  - [ ] Store job info into Postgres
+  - [x] Store job info into Postgres
 
 - [ ] Store and load user queues to/from database
 
@@ -56,7 +63,7 @@ Ta-da! Now navigate your browser to `127.0.0.1:3000`.
   - [ ] Serve finished video back to web interface
   - [ ] Remove temp files
 
-- [ ] Assemble Passport.js/OpenID authentication implementation with this web interface
+- [x] Assemble Passport.js/OpenID authentication implementation with this web interface
 
 ### Should do (code cleanup):
 

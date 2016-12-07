@@ -1,13 +1,18 @@
 {
-  "name" : "cs160-testdrive",
-  "version" : "0.2.1",
-  "scripts" : {
-    "start" : "node Server.js"
+  "name": "cs160-testdrive",
+  "version": "0.2.1",
+  "scripts": {
+    "start": "node Server.js"
   },
-  "dependencies" : {
-    "express" : "latest",
-    "multer" : "latest",
-    "body-parser" : "latest",
-    "pg" : "latest"
+  "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "latest",
+    "connect-flash": "^0.1.1",
+    "ejs": "latest",
+    "express": "latest",
+    "express-session": "latest",
+    "multer": "latest",
+    "passport": "latest",
+    "pg": "latest"
   }
 }

@@ -1,8 +1,3 @@
-#!/bin/sh
-createdb faceservice;
-
-psql faceservice $USER << EOF
-
 CREATE TABLE jobs(
 	ownerid integer,
 	cvimplementation VARCHAR(64),
@@ -24,13 +19,7 @@ CREATE TABLE users(
 	ownerid integer,
 	name VARCHAR(64),
 	email VARCHAR(64),
-	password VARCHAR(64),
-	facebookid VARCHAR(64),
-	facebooktoken VARCHAR(64)
 
 );
 
-CREATE SEQUENCE ownerid START 1;
-
-EOF
-exit 0;
+CREATE SEQUENCE ownerid START 0;
