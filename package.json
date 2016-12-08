@@ -13,6 +13,8 @@
     "express-session": "latest",
     "multer": "latest",
     "passport": "latest",
+    "passport-local" : "latest",
+    "passport-facebook" : "latest",
     "passport-google-oauth": "^1.0.0",
     "passport-twitter": "^1.0.4",
     "pg": "latest"

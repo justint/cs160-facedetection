@@ -124,7 +124,7 @@ app.post('/create-job', upload.single('video-file'), function (req, res, next) {
 });
 
 // Get a list of jobs for a user
-router.get('/getjobs:ownerid', (req, res, next) => {
+app.post('/getjobs:ownerid', (req, res, next) => {
   const results = [];
   // Get a Postgres client from the connection pool
   pg.connect(connectionString, (err, client, done) => {
@@ -134,8 +134,8 @@ router.get('/getjobs:ownerid', (req, res, next) => {
       console.log(err);
       return res.status(500).json({success: false, data: err});
     }
-    // SQL Query > Select Data
-    const query = client.query('SELECT * FROM jobs WHERE ownerid=($1);');
+
+    const query = client.query('SELECT * FROM jobs WHERE ownerid=' + req.body.ownerid + ';');
     // Stream results back one row at a time
     query.on('row', (row) => {
       results.push(row);

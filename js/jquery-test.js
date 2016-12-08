@@ -322,4 +322,37 @@ function jobExecListener(jobNum) {
  */
 $(document).ready(function() {
 
+    $.ajax({
+      url: "/getjobs:ownerid",
+      method: "GET",
+      data: {
+        "ownerid" : $("#ownerid")[0].innerHTML.trim()
+      }
+    })
+    .done(function(e) {
+      if (e)
+      {
+        console.log(JSON.stringify(e));
+      }
+    });
+
+    var jobs = getJobs( $("#ownerid")[0].innerHTML.trim() );
+
+    for (var j of jobs)
+    {
+      console.log(JSON.stringify(j));
+      /*
+      var jobData = {
+        ownerid: $("#ownerid")[0].innerHTML.trim(),
+        filename: video.files[0].name,
+        jobNum: jobCount,
+        filesize: video.files[0].size,
+        submitDateTime: new Date(),
+        status: "uploading...",
+        pingType: 0
+      }
+      */
+
+      addJobToJobList(jobData);
+    }
 });
