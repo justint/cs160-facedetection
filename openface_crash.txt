@@ -1,0 +1,89 @@
+OpenFace/build [master●] » sudo bin/FaceLandmarkVid -device 0
+Password:
+Reading the CLNF landmark detector/tracker from: bin/model/main_clnf_general.txt
+Reading the landmark detector module from: bin/model/clnf_general.txt
+Reading the PDM module from: bin/model/pdms/In-the-wild_aligned_PDM_68.txt....Done
+Reading the Triangulations module from: bin/model/tris_68.txt....Done
+Reading the intensity CCNF patch experts from: bin/model/patch_experts/ccnf_patches_0.25_general.txt....Done
+Reading the intensity CCNF patch experts from: bin/model/patch_experts/ccnf_patches_0.35_general.txt....Done
+Reading the intensity CCNF patch experts from: bin/model/patch_experts/ccnf_patches_0.5_general.txt....Done
+Reading part based module....inner
+Reading the CLNF landmark detector/tracker from: bin/model/model_inner/main_clnf_inner.txt
+Reading the landmark detector module from: bin/model/model_inner/clnf_inner.txt
+Reading the PDM module from: bin/model/model_inner/pdms/pdm_51_inner.txt....Done
+Reading the intensity CCNF patch experts from: bin/model/model_inner/patch_experts/ccnf_patches_1.00_inner.txt....Done
+Done
+Reading part based module....left_eye_28
+Reading the CLNF landmark detector/tracker from: bin/model/model_eye/main_clnf_synth_left.txt
+Reading the landmark detector module from: bin/model/model_eye/clnf_left_synth.txt
+Reading the PDM module from: bin/model/model_eye/pdms/pdm_28_l_eye_3D_closed.txt....Done
+Reading the intensity CCNF patch experts from: bin/model/model_eye/patch_experts/left_ccnf_patches_1.00_synth_lid_.txt....Done
+Reading the intensity CCNF patch experts from: bin/model/model_eye/patch_experts/left_ccnf_patches_1.50_synth_lid_.txt....Done
+Done
+Reading part based module....right_eye_28
+Reading the CLNF landmark detector/tracker from: bin/model/model_eye/main_clnf_synth_right.txt
+Reading the landmark detector module from: bin/model/model_eye/clnf_right_synth.txt
+Reading the PDM module from: bin/model/model_eye/pdms/pdm_28_eye_3D_closed.txt....Done
+Reading the intensity CCNF patch experts from: bin/model/model_eye/patch_experts/ccnf_patches_1.00_synth_lid_.txt....Done
+Reading the intensity CCNF patch experts from: bin/model/model_eye/patch_experts/ccnf_patches_1.50_synth_lid_.txt....Done
+Done
+Reading the landmark validation module....Done
+Attempting to capture from device: 0
+Device or file opened
+Starting tracking
+
+...
+Camera dropped frame!
+Camera dropped frame!
+Camera dropped frame!
+...
+
+2016-10-26 20:29:46.040 FaceLandmarkVid[56540:1633266] -[CaptureDelegate doFireTimer:]: unrecognized selector sent to instance 0x7fb223f049c0
+2016-10-26 20:29:46.077 FaceLandmarkVid[56540:1633266] An uncaught exception was raised
+2016-10-26 20:29:46.078 FaceLandmarkVid[56540:1633266] -[CaptureDelegate doFireTimer:]: unrecognized selector sent to instance 0x7fb223f049c0
+2016-10-26 20:29:46.078 FaceLandmarkVid[56540:1633266] (
+	0   CoreFoundation                      0x00007fff93a604f2 __exceptionPreprocess + 178
+	1   libobjc.A.dylib                     0x00007fff9abfbf7e objc_exception_throw + 48
+	2   CoreFoundation                      0x00007fff93aca1ad -[NSObject(NSObject) doesNotRecognizeSelector:] + 205
+	3   CoreFoundation                      0x00007fff939d0571 ___forwarding___ + 1009
+	4   CoreFoundation                      0x00007fff939d00f8 _CF_forwarding_prep_0 + 120
+	5   Foundation                          0x00007fff8c592dec __NSFireTimer + 95
+	6   CoreFoundation                      0x00007fff939ddb94 __CFRUNLOOP_IS_CALLING_OUT_TO_A_TIMER_CALLBACK_FUNCTION__ + 20
+	7   CoreFoundation                      0x00007fff939dd823 __CFRunLoopDoTimer + 1075
+	8   CoreFoundation                      0x00007fff939dd37a __CFRunLoopDoTimers + 298
+	9   CoreFoundation                      0x00007fff939d4871 __CFRunLoopRun + 1841
+	10  CoreFoundation                      0x00007fff939d3ed8 CFRunLoopRunSpecific + 296
+	11  HIToolbox                           0x00007fff9796d935 RunCurrentEventLoopInMode + 235
+	12  HIToolbox                           0x00007fff9796d677 ReceiveNextEventCommon + 184
+	13  HIToolbox                           0x00007fff9796d5af _BlockUntilNextEventMatchingListInModeWithFilter + 71
+	14  AppKit                              0x00007fff91cc1df6 _DPSNextEvent + 1067
+	15  AppKit                              0x00007fff91cc1226 -[NSApplication _nextEventMatchingEventMask:untilDate:inMode:dequeue:] + 454
+	16  libopencv_highgui.3.1.dylib         0x0000000102c34802 cvWaitKey + 306
+	17  FaceLandmarkVid                     0x000000010222bccc main + 10668
+	18  libdyld.dylib                       0x00007fff915985ad start + 1
+	19  ???                                 0x0000000000000003 0x0 + 3
+)
+2016-10-26 20:29:46.078 FaceLandmarkVid[56540:1633266] *** Terminating app due to uncaught exception 'NSInvalidArgumentException', reason: '-[CaptureDelegate doFireTimer:]: unrecognized selector sent to instance 0x7fb223f049c0'
+*** First throw call stack:
+(
+	0   CoreFoundation                      0x00007fff93a604f2 __exceptionPreprocess + 178
+	1   libobjc.A.dylib                     0x00007fff9abfbf7e objc_exception_throw + 48
+	2   CoreFoundation                      0x00007fff93aca1ad -[NSObject(NSObject) doesNotRecognizeSelector:] + 205
+	3   CoreFoundation                      0x00007fff939d0571 ___forwarding___ + 1009
+	4   CoreFoundation                      0x00007fff939d00f8 _CF_forwarding_prep_0 + 120
+	5   Foundation                          0x00007fff8c592dec __NSFireTimer + 95
+	6   CoreFoundation                      0x00007fff939ddb94 __CFRUNLOOP_IS_CALLING_OUT_TO_A_TIMER_CALLBACK_FUNCTION__ + 20
+	7   CoreFoundation                      0x00007fff939dd823 __CFRunLoopDoTimer + 1075
+	8   CoreFoundation                      0x00007fff939dd37a __CFRunLoopDoTimers + 298
+	9   CoreFoundation                      0x00007fff939d4871 __CFRunLoopRun + 1841
+	10  CoreFoundation                      0x00007fff939d3ed8 CFRunLoopRunSpecific + 296
+	11  HIToolbox                           0x00007fff9796d935 RunCurrentEventLoopInMode + 235
+	12  HIToolbox                           0x00007fff9796d677 ReceiveNextEventCommon + 184
+	13  HIToolbox                           0x00007fff9796d5af _BlockUntilNextEventMatchingListInModeWithFilter + 71
+	14  AppKit                              0x00007fff91cc1df6 _DPSNextEvent + 1067
+	15  AppKit                              0x00007fff91cc1226 -[NSApplication _nextEventMatchingEventMask:untilDate:inMode:dequeue:] + 454
+	16  libopencv_highgui.3.1.dylib         0x0000000102c34802 cvWaitKey + 306
+	17  FaceLandmarkVid                     0x000000010222bccc main + 10668
+	18  libdyld.dylib                       0x00007fff915985ad start + 1
+	19  ???                                 0x0000000000000003 0x0 + 3
+)

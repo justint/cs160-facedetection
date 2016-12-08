@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DreamTeam CV Pipeliner</title>
+
+<!-- Tutorial scripts + stylesheets -->
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.3/angular.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.3/angular-route.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+
+<!-- My style sheet -->
+<link href="css/index.css" rel="stylesheet">
+</head>
+<body>
+<div class="navbar-area">
+  <nav class="navbar navbar-inverse" role="navigation">
+    <ul class="nav navbar-nav navbar-right">
+              <li><a href="#"><span class="glyphicon glyphicon-user" aria-hidden="true"> </span>&nbsp;&nbsp;
+                <% if (user.provider != null) { %>
+                  <%= user.displayName %>
+                <% } else { %>
+                  <%= user.email %>
+                <% } %></a></li>
+              <li><a href="#">Settings</a></li>
+              <li><a href="/logout">Logout <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span></a></li>
+    </ul>
+  </nav>
+</div>
+<div class="container">
+  <div class="notification-area">
+  </div>
+  <div class="row">
+    <div class="col-sm-8">
+      <div class="job-list">
+        <p class="no-job-text">No jobs queued...</p>
+      </div>
+      <div class="add-job" title="New Job">
+        <a href="#" id="add-job">
+          <span class="add-job glyphicon glyphicon-plus-sign" aria-hidden="true"> </span>
+        </a>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div id="new-job-panel" class="sidebar-panel panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">New Job</h3>
+        </div>
+        <div class="panel-body">
+          <form id="video-submit" method="post" action="/create-job" target="dead_iframe" enctype="multipart/form-data">
+            <input type="file" name="video-file"></input>
+            <select name="cv-implementation">
+              <option value="default">face_rectangle</option>
+            </select>
+            <input type="hidden" name="job-number"></input>
+            <input type="hidden" name="ownerid">
+            <p hidden id="ownerid">
+            <% if (user.provider != null) { %>
+              <%= user.id %>
+            <% } else { %>
+                <%= user.ownerid %>
+            <% } %>
+          </p>
+            <button type="submit">Queue job</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="footer">
+  <div class="container">
+    Dream Team CS 160
+  </div>
+</div>
+<script src="js/jquery-test.js"></script>
+<iframe name="dead_iframe" id="dead_iframe"></iframe>
+</body>
+</html>

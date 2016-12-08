@@ -1,0 +1,33 @@
+<script type="text/html" id="template">
+  <div class="job new-job panel panel-default">
+    <table class="job">
+      <tr>
+        <td class="job-thumbnail">
+          <img class="job img-thumbnail" alt="100x100" data-src="thumbnail" data-holder-rendered="true">
+        </td>
+        <td class="job-body">
+          <table class="job job-body">
+            <tr>
+              <td class="job-name" data-content="jobName">
+              </td>
+              <td class="job-num" data-content="jobNum">
+              </td>
+            </tr>
+            <tr>
+              <td>Filesize: <span data-content="filesize"></span></td>
+            </tr>
+            <tr>
+              <td>Submit time: <span data-content="submit_time"></span></td>
+            </tr>
+            <tr>
+              <td>Status: <span class="job-processing job-processing-icon glyphicon glyphicon-repeat" aria-hidden="true"> </span><span id="job-status" data-content="status"></span></td>
+              <td class="job-buttons">
+                <button class="start-job-button" data-id="jobNum" disabled>Start job</button>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </div>
+</script>
