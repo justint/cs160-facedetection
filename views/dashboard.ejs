@@ -18,7 +18,12 @@
 <div class="navbar-area">
   <nav class="navbar navbar-inverse" role="navigation">
     <ul class="nav navbar-nav navbar-right">
-              <li><a href="#"><span class="glyphicon glyphicon-user" aria-hidden="true"> </span>&nbsp;&nbsp;<%= user.email %></a></li>
+              <li><a href="#"><span class="glyphicon glyphicon-user" aria-hidden="true"> </span>&nbsp;&nbsp;
+                <% if (user.provider != null) { %>
+                  <%= user.displayName %>
+                <% } else { %>
+                  <%= user.email %>
+                <% } %></a></li>
               <li><a href="#">Settings</a></li>
               <li><a href="/logout">Logout <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span></a></li>
     </ul>
@@ -50,6 +55,14 @@
               <option value="default">face_rectangle</option>
             </select>
             <input type="hidden" name="job-number"></input>
+            <input type="hidden" name="ownerid">
+            <p hidden id="ownerid">
+            <% if (user.provider != null) { %>
+              <%= user.id %>
+            <% } else { %>
+                <%= user.ownerid %>
+            <% } %>
+          </p>
             <button type="submit">Queue job</button>
           </form>
         </div>

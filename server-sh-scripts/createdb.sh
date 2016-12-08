@@ -4,7 +4,7 @@ createdb faceservice;
 psql faceservice $USER << EOF
 
 CREATE TABLE jobs(
-	ownerid integer,
+	ownerid TEXT,
 	cvimplementation VARCHAR(64),
 	fieldname VARCHAR(64),
 	jobnumber integer,

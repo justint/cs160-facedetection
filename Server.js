@@ -23,8 +23,6 @@ console.log("Initializing server...");
 
 // Initialize empty list of jobs
 var jobList = [];
-var userid = 1;
-
 require('./config/passport')(passport); // pass passport for configuration
 
 // Enable body-parser for JSON parsing
@@ -102,7 +100,7 @@ app.post('/create-job', upload.single('video-file'), function (req, res, next) {
       jobList.push(newJob);
 
       insertdb(
-        userid,
+        req.body['ownerid'],
         req.body['cv-implementation'],
         req.file['fieldname'],
         req.body['job-number'],

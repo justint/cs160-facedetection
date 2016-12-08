@@ -121,6 +121,7 @@ $("#video-submit").submit(function(e) {
   jobCount++;
 
   var jobData = {
+    ownerid: $("#ownerid")[0].innerHTML.trim(),
     filename: video.files[0].name,
     jobNum: jobCount,
     filesize: video.files[0].size,
@@ -129,8 +130,9 @@ $("#video-submit").submit(function(e) {
     pingType: 0
   }
 
-  // Update form job number
+  // Update form job number, ownerid
   form.elements["job-number"].value = jobCount;
+  form.elements["ownerid"].value = $("#ownerid")[0].innerHTML.trim();
 
   // Send form data to server
   form.submit();

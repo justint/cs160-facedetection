@@ -1,6 +1,8 @@
 // load all the things we need
 var LocalStrategy    = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
+var TwitterStrategy  = require('passport-twitter').Strategy;
+var GoogleStrategy   = require('passport-google-oauth').OAuth2Strategy;
 var bcrypt           = require('bcrypt-nodejs');
 
 
@@ -15,17 +17,22 @@ module.exports = function(passport) {
     // used to serialize the user for the session
     passport.serializeUser(function(user, done) {
        console.log("serializing user: " + JSON.stringify(user));
-       if (user._result != null)
+       if (user.provider != null)
+          done(null, user);
+       else if (user._result != null)
           done(null, user._result.rows[0].ownerid);
        else done(null, user.ownerid);
     });
 
     // used to deserialize the user
     passport.deserializeUser(function(id, done) {
-        console.log("deserializing user id: " + id);
-        User.findById(id, function(err, user) {
-            done(err, user);
-        });
+        console.log("deserializing user id: " + JSON.stringify(id));
+        if (id.provider != null)
+           done(null, id);
+        else {
+          User.findById(id, function(err, user) {
+              done(err, user);
+        })};
     });
 
 
@@ -114,11 +121,11 @@ module.exports = function(passport) {
             } else if ( !req.user.email ) {
                 // ...presumably they're trying to connect a local account
                 // BUT let's check if the email used to connect a local account is being used by another user
-                User.findOne({ 'email' :  email }, function(err, user) {
+                User.findOne({ 'email' :  email }, function(err, isNotAvailable, user) {
                     if (err)
                         return done(err);
 
-                    if (user) {
+                    if (isNotAvailable) {
                         return done(null, false, req.flash('loginMessage', 'That email is already taken.'));
                         // Using 'loginMessage instead of signupMessage because it's used by /connect/local'
                     } else {
@@ -142,86 +149,57 @@ module.exports = function(passport) {
 
     }));
 
-    // =========================================================================
-    // FACEBOOK ================================================================
-    // =========================================================================
-    passport.use(new FacebookStrategy({
 
-        // pull in our app id and secret from our auth.js file
-        clientID        : configAuth.facebookAuth.clientID,
-        clientSecret    : configAuth.facebookAuth.clientSecret,
-        callbackURL     : configAuth.facebookAuth.callbackURL
+        // =========================================================================
+        // FACEBOOK ================================================================
+        // =========================================================================
+        passport.use(new FacebookStrategy({
 
-    },
+            // pull in our app id and secret from our auth.js file
+            clientID        : configAuth.facebookAuth.clientID,
+            clientSecret    : configAuth.facebookAuth.clientSecret,
+            callbackURL     : configAuth.facebookAuth.callbackURL
 
-    // facebook will send back the token and profile
-    function(token, refreshToken, profile, done) {
+        },
 
-        // asynchronous
-        process.nextTick(function() {
+        // facebook will send back the token and profile
+        function(token, refreshToken, profile, done) {
+            return done(null, profile);
+        }));
 
 
-          // check if the user is already logged in
-          if (!req.user) {
 
-              User.findOne('facebook.id', function(err, user) {
-                  if (err)
-                      return done(err);
+        // =========================================================================
+        // TWITTER =================================================================
+        // =========================================================================
+        passport.use(new TwitterStrategy({
 
-                  if (user) {
+            consumerKey     : configAuth.twitterAuth.consumerKey,
+            consumerSecret  : configAuth.twitterAuth.consumerSecret,
+            callbackURL     : configAuth.twitterAuth.callbackURL
 
-                      // if there is a user id already but no token (user was linked at one point and then removed)
-                      if (!user.facebook.token) {
-                          user.facebooktoken = token;
-                          user.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName;
-                          user.facebook.email = (profile.emails[0].value || '').toLowerCase();
+        },
+        function(token, tokenSecret, profile, done) {
+            return done(null, profile);
+        }));
 
-                          user.save(function(err) {
-                              if (err)
-                                  return done(err);
 
-                              return done(null, user);
-                          });
-                      }
 
-                      return done(null, user); // user found, return that user
-                  } else {
-                      // if there is no user, create them
-                      var newUser            = new User();
+        // =========================================================================
+        // GOOGLE ==================================================================
+        // =========================================================================
+        passport.use(new GoogleStrategy({
 
-                      newUser.facebook.id    = profile.id;
-                      newUser.facebook.token = token;
-                      newUser.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName;
-                      newUser.facebook.email = (profile.emails[0].value || '').toLowerCase();
+            clientID        : configAuth.googleAuth.clientID,
+            clientSecret    : configAuth.googleAuth.clientSecret,
+            callbackURL     : configAuth.googleAuth.callbackURL,
 
-                      newUser.save(function(err) {
-                          if (err)
-                              return done(err);
+        },
+        function(token, refreshToken, profile, done) {
 
-                          return done(null, newUser);
-                      });
-                  }
-              });
+            return done(null, profile);
 
-          } else {
-              // user already exists and is logged in, we have to link accounts
-              var user            = req.user; // pull the user out of the session
+        }));
 
-              user.facebook.id    = profile.id;
-              user.facebook.token = token;
-              user.facebook.name  = profile.name.givenName + ' ' + profile.name.familyName;
-              user.facebook.email = (profile.emails[0].value || '').toLowerCase();
-
-              user.save(function(err) {
-                  if (err)
-                      return done(err);
-
-                  return done(null, user);
-              });
-
-          }
-        });
-
-    }));
 
 };
