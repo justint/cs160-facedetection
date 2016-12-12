@@ -16,7 +16,7 @@ module.exports = function(passport) {
 
     // used to serialize the user for the session
     passport.serializeUser(function(user, done) {
-       console.log("serializing user: " + JSON.stringify(user));
+       //console.log("serializing user: " + JSON.stringify(user));
        if (user.provider != null)
           done(null, user);
        else if (user._result != null)
@@ -26,7 +26,7 @@ module.exports = function(passport) {
 
     // used to deserialize the user
     passport.deserializeUser(function(id, done) {
-        console.log("deserializing user id: " + JSON.stringify(id));
+        //console.log("deserializing user id: " + JSON.stringify(id));
         if (id.provider != null)
            done(null, id);
         else {
@@ -53,7 +53,7 @@ module.exports = function(passport) {
         // find a user whose email is the same as the forms email
         // we are checking to see if the user trying to login already exists
         User.findOne(email, function(err, isNotAvailable, user) {
-            console.log("returned user: " + JSON.stringify(user));
+            //console.log("returned user: " + JSON.stringify(user));
             // if there are any errors, return the error before anything else
             if (err)
                 return done(err);
@@ -63,8 +63,8 @@ module.exports = function(passport) {
                 return done(null, false, req.flash('loginMessage', 'No user found.')); // req.flash is the way to set flashdata using connect-flash
 
             // if the user is found but the password is wrong
-            console.log("password: " + password);
-            console.log("user.password: " + user._result.rows[0].password);
+            //console.log("password: " + password);
+            //console.log("user.password: " + user._result.rows[0].password);
             if (!bcrypt.compareSync(password, user._result.rows[0].password))
                 return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); // create the loginMessage and save it to session as flashdata
 

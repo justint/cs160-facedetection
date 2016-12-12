@@ -67,11 +67,11 @@ router.get("/stats", function(req,res){
 // Handle when user starts a job
 app.post('/start-job', function (req, res){
 
-    console.log("Job " + req.body['job-number']  + " starting...");
+    console.log("Job " + req.body['job-number'] + " starting...");
     //console.log(req.body);
 
     //Start job pipeline
-    jobList[ req.body['job-number'] - 1 ].execute( req.body['job-number'] );
+    jobList[ req.body['job-number'] - 1 ].execute( req.body['job-number'], jobList[req.body['job-number'] - 1].jobData );
 
     updateJobStatus(req.body['ownerid'], req.body['job-number'], 1);
 
@@ -95,7 +95,7 @@ app.post('/create-job', upload.single('video-file'), function (req, res, next) {
     {
       // Create new job, add to job list
       //TODO: pass in actual job data
-      var newJob = new Job(req.body['job-number']);
+      var newJob = new Job(req.body['job-number'], [req.body, req.file]);
       var status = 0;
       jobList.push(newJob);
 
@@ -233,6 +233,7 @@ app.post("/job-status", function(req, res){
     }
     case 1: // Processing status
     {
+
       if (jobList[req.body.jobNum - 1].complete) {
         console.log("Sending job complete status...");
         res.send(true);

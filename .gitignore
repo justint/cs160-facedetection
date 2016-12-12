@@ -49,5 +49,13 @@ jspm_packages
 # Uploaded videos
 uploads
 
+# Video processing/output files
+exec/frame_split
+exec/points_run
+exec/output
+
+# Compiled python
+*.pyc
+
 # Thumbnails
 .DS_Store
