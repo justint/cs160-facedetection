@@ -334,34 +334,34 @@ function jobExecListener(jobNum) {
           buttonList = $(buttonList);
 
           var downloadButton = '<a href="' + jobPath + '" id="download-job-button" class="btn">Download</a>';
-          var playButton = '<a href="' + "#video-" + jobNum + '" id="play-job-button" class="btn" data-toggle="modal">Play</a>';
+          var playButton = '<a href="' + "#modal-player-" + jobNum + '" id="play-job-button" class="btn" data-toggle="modal">Play</a>';
 
           buttonList.prepend(downloadButton);
           buttonList.prepend(playButton);
 
           var modal = $(".job-" + jobNum)[0].children[1];
           modal = $(modal);
-          modal.load("/templates/video-player.html"), function(modal) {
-            $.getScript('/js/jquery.loadTemplate.min.js', function(modal)
+          console.log("modal: " + modal);
+
+            $.getScript('/js/jquery.loadTemplate.min.js', function()
             {
               console.log("modal-player: " + $("#modal-player-" + jobNum) );
-              
-              $("#modal-player-" + jobNum).loadTemplate($("#template"),
+
+              $("#modal-player-" + jobNum).loadTemplate("/templates/video-player.html",
               {
-                  jobName: "test",
+                  jobName: $("td[class='job-num']:contains(" + jobNum + ")")[0].parentElement.parentElement.querySelector(".job-name").innerHTML,
                   jobPath: jobPath,
                   videoId: "video-" + jobNum
                 }, { success: function() {
                     console.log("Video player embedded");
                     // Call videojs funct on "video-" + jobData.jobNum
-                    videojs($("video-" + jobNum)[0], {}, function(){
-                        // Player (this) is initialized and ready.
+                    videojs($("#video-" + jobNum)[0], {}, function(){
+                        this.width = $(".modal-body")[0].clientWidth;
                     });
                   }
                 }
               )
             });
-          };
 
           //$("#job-player-source").attr('src', jobPath);
 
