@@ -299,10 +299,11 @@ function jobExecListener(jobNum) {
          "pingType" : 1
         }
      })
-      .done(function(e) {
-        if (e) // Job is done
+      .done(function(job) {
+        if (job) // Job is done
         {
           console.log("Job " + jobNum + " done, stopping jobExecListener");
+          console.log("Completed job path: " + job);
           clearInterval(ping);
           var jobProcessingIcon = $("td[class='job-num']:contains(" + jobNum + ")")[0].parentElement.parentElement.querySelector(".job-processing-icon");
           jobProcessingIcon = $(jobProcessingIcon);
