@@ -207,6 +207,7 @@ function uploadListener(jobData) {
           jobProcessingIcon.animate({"opacity": "0"}, 500);
 
           $("td[class='job-num']:contains(" + jobData.jobNum + ")")[0].parentElement.parentElement.querySelector("#job-status").innerHTML = strings.ready_to_start;
+
       });
     }, timeout);
 }
@@ -232,7 +233,8 @@ function addJobToJobList(jobData) {
             filesize: formatBytes(jobData.filesize, 2),
             submit_time: jobData.submitDateTime,
             status: statusStrings[jobData.status],
-            thumbnail: "/img/thumbnail.gif"
+            thumbnail: "/img/thumbnail.gif",
+            modalPlayer: "modal-player-" + jobData.jobNum
           }, { success: function() {
             // Executed after template is filled -- animates job entrance
             $('.new-job').slideDown("fast");
@@ -250,7 +252,7 @@ function addJobToJobList(jobData) {
               if (jobCount == 1) $('.no-job-text').animate({"opacity": "0"}, 700).detach();
 
               // Hide job-processing icon
-              if(jobData.status == 3) {
+              if(jobData.status == 0 || jobData.complete) {
                 $('.job-processing-icon').animate({"opacity": "0"}, 500).detach();
               }
             }
@@ -304,16 +306,64 @@ function jobExecListener(jobNum) {
          "pingType" : 1
         }
      })
-      .done(function(job) {
-        if (job) // Job is done
+      .done(function(jobPath) {
+        if (jobPath) // Job is done
         {
           console.log("Job " + jobNum + " done, stopping jobExecListener");
-          console.log("Completed job path: " + job);
+          console.log("Completed job path: " + jobPath);
           clearInterval(ping);
           var jobProcessingIcon = $("td[class='job-num']:contains(" + jobNum + ")")[0].parentElement.parentElement.querySelector(".job-processing-icon");
           jobProcessingIcon = $(jobProcessingIcon);
           jobProcessingIcon.animate({"opacity": "0"}, 500);
           $("td[class='job-num']:contains(" + jobNum + ")")[0].parentElement.parentElement.querySelector("#job-status").innerHTML = strings.done;
+
+          /*
+          var playButton = $("td[class='job-num']:contains(" + jobNum + ")")[0].parentElement.parentElement.querySelector("#play-job-button");
+          playButton.style.visibility = "visible";
+          playButton = $(playButton);
+          playButton.attr('href', "#modal-player");
+          playButton.attr('data-toggle', "modal");
+
+          var downloadButton = $("td[class='job-num']:contains(" + jobNum + ")")[0].parentElement.parentElement.querySelector("#download-job-button");
+          downloadButton.style.visibility = "visible";
+          downloadButton = $(downloadButton);
+          downloadButton.attr('href', jobPath);
+          */
+
+          var buttonList = $("td[class='job-num']:contains(" + jobNum + ")")[0].parentElement.parentElement.querySelector(".job-buttons");
+          buttonList = $(buttonList);
+
+          var downloadButton = '<a href="' + jobPath + '" id="download-job-button" class="btn">Download</a>';
+          var playButton = '<a href="' + "#video-" + jobNum + '" id="play-job-button" class="btn" data-toggle="modal">Play</a>';
+
+          buttonList.prepend(downloadButton);
+          buttonList.prepend(playButton);
+
+          var modal = $(".job-" + jobNum)[0].children[1];
+          modal = $(modal);
+          modal.load("/templates/video-player.html"), function(modal) {
+            $.getScript('/js/jquery.loadTemplate.min.js', function(modal)
+            {
+              console.log("modal-player: " + $("#modal-player-" + jobNum) );
+              
+              $("#modal-player-" + jobNum).loadTemplate($("#template"),
+              {
+                  jobName: "test",
+                  jobPath: jobPath,
+                  videoId: "video-" + jobNum
+                }, { success: function() {
+                    console.log("Video player embedded");
+                    // Call videojs funct on "video-" + jobData.jobNum
+                    videojs($("video-" + jobNum)[0], {}, function(){
+                        // Player (this) is initialized and ready.
+                    });
+                  }
+                }
+              )
+            });
+          };
+
+          //$("#job-player-source").attr('src', jobPath);
 
           // Todo: return actual set of job complete data (errors, etc)
           genJobAlert(Alerts.SUCCESS, { "jobNum" : jobNum });
@@ -349,7 +399,7 @@ $(document).ready(function() {
     //   console.log(JSON.stringify(j));
        $.post( "http://localhost:3000/getjobs", { ownerid: $("#ownerid")[0].innerHTML.trim()})
         .done(function( data ) {
-          
+
           console.log(data);
           for(var i = 0; i < data.length; i++) {
             var jobData = {
@@ -364,11 +414,11 @@ $(document).ready(function() {
 
           console.log(jobData);
 
-       
+
 
        addJobToJobList(jobData);
         }
-      });   
-     
-    
+      });
+
+
 });

@@ -88,8 +88,11 @@ div.job {
   transition: all 0.3s ease 0s;
 }
 
-.job-processing {
+#job-status {
   padding-left: 5px;
+}
+
+.job-processing {
   color: #ccc;
   transition: all 0.3s ease 0s;
 

@@ -239,7 +239,7 @@ app.post("/job-status", function(req, res){
     {
       if (jobList["" + req.body.jobNum].complete) {
         console.log("Sending job complete status...");
-        var jobFinishPath = "/Users/justintennant/Desktop/cs160-testdrive/exec/output/" + jobList["" + req.body.jobNum].jobData[1].filename + ".mp4";
+        var jobFinishPath = "/download/" + jobList["" + req.body.jobNum].jobData[1].filename;
         res.send(jobFinishPath);
       }
       else res.send(false);

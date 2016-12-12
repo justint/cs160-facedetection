@@ -1,0 +1,17 @@
+<script type="text/html" id="template">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+              <h4 class="modal-title" data-content="jobName"></h4>
+          </div>
+          <div class="modal-body">
+            <video data-id="videoId" class="video-js vjs-default-skin vjs-big-play-centered"
+              controls autoplay preload="none" width="600" height="600">
+              <source id="job-player-source" data-src="jobPath" type="video/mp4" />
+              <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+            </video>
+          </div>
+      </div>
+  </div>
+</script>
