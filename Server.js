@@ -22,7 +22,7 @@ var app = express();
 console.log("Initializing server...");
 
 // Initialize empty list of jobs
-var jobList = [];
+var jobList = new Object();
 require('./config/passport')(passport); // pass passport for configuration
 
 // Enable body-parser for JSON parsing
@@ -46,10 +46,7 @@ router.use(function (req,res,next) {
   clearShell();
 });
 
-router.get("/", function(req,res){
-  res.render("index.ejs");
-  //res.sendFile(path + "index.html");
-});
+
 
 /*
 router.get("/dashboard", function(req,res){
@@ -71,7 +68,8 @@ app.post('/start-job', function (req, res){
     //console.log(req.body);
 
     //Start job pipeline
-    jobList[ req.body['job-number'] - 1 ].execute( req.body['job-number'], jobList[req.body['job-number'] - 1].jobData );
+    console.log("starting this job: " + JSON.stringify(jobList[""  + req.body['job-number']]));
+    jobList[""  + req.body['job-number']].execute( req.body['job-number'], jobList[""  + req.body['job-number']].jobData );
 
     updateJobStatus(req.body['ownerid'], req.body['job-number'], 1);
 
@@ -96,8 +94,9 @@ app.post('/create-job', upload.single('video-file'), function (req, res, next) {
       // Create new job, add to job list
       //TODO: pass in actual job data
       var newJob = new Job(req.body['job-number'], [req.body, req.file]);
+
       var status = 0;
-      jobList.push(newJob);
+      jobList["" + req.body['job-number']] = newJob;
 
       insertdb(
         req.body['ownerid'],
@@ -111,7 +110,7 @@ app.post('/create-job', upload.single('video-file'), function (req, res, next) {
         req.file['filename'],
         req.file['path'],
         req.file['size'],
-        status
+        3
       );
 
       // Send success status to client
@@ -124,7 +123,7 @@ app.post('/create-job', upload.single('video-file'), function (req, res, next) {
 });
 
 // Get a list of jobs for a user
-app.post('/getjobs:ownerid', (req, res, next) => {
+app.post('/getjobs', (req, res, next) => {
   const results = [];
   // Get a Postgres client from the connection pool
   pg.connect(connectionString, (err, client, done) => {
@@ -134,15 +133,20 @@ app.post('/getjobs:ownerid', (req, res, next) => {
       console.log(err);
       return res.status(500).json({success: false, data: err});
     }
-
-    const query = client.query('SELECT * FROM jobs WHERE ownerid=' + req.body.ownerid + ';');
+    var ownerid = "" + req.body.ownerid;
+    const query = client.query("SELECT * FROM jobs WHERE ownerid=($1)",
+      [ownerid]);
+    //const query = client.query('SELECT * FROM jobs WHERE ownerid=' + req.body.ownerid + ';');
     // Stream results back one row at a time
     query.on('row', (row) => {
+      console.log("row!");
       results.push(row);
     });
     // After all data is returned, close connection and return results
     query.on('end', () => {
       done();
+
+
       return res.json(results);
     });
   });
@@ -179,7 +183,7 @@ function getJobs(ownerid) {
       console.log(err);
     }
     // SQL Query > Select Data
-    const query = client.query('SELECT * FROM jobs WHERE ownerid=(' + ownerid + ');');
+    const query = client.query('SELECT * FROM users WHERE ownerid=($1)', [ownerid]);
     // Stream results back one row at a time
     query.on('row', (row) => {
       console.log("row: " + row);
@@ -224,7 +228,7 @@ app.post("/job-status", function(req, res){
   {
     case 0: // Upload status
     {
-      if (jobList[req.body.jobNum - 1] != null)
+      if (jobList["" + req.body.jobNum] != null)
       {
         console.log("File upload complete, adding to client job list...");
         res.status(200).send(req.body.jobNum);
@@ -233,10 +237,9 @@ app.post("/job-status", function(req, res){
     }
     case 1: // Processing status
     {
-
-      if (jobList[req.body.jobNum - 1].complete) {
+      if (jobList["" + req.body.jobNum].complete) {
         console.log("Sending job complete status...");
-        var jobFinishPath = "/Users/justintennant/Desktop/cs160-testdrive/exec/output/" + jobList[req.body.jobNum - 1].jobData[1].filename + ".mp4";
+        var jobFinishPath = "/Users/justintennant/Desktop/cs160-testdrive/exec/output/" + jobList["" + req.body.jobNum].jobData[1].filename + ".mp4";
         res.send(jobFinishPath);
       }
       else res.send(false);

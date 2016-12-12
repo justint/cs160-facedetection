@@ -12,6 +12,7 @@ var strings = {
   processing : "processing...",
   done : "job complete"
 }
+var statusStrings = ["uploading...","ready to start", "processing...", "job complete"]
 
 /* Handler for new job button below job list, displays new job panel. */
 $( "#add-job" ).click(function() {
@@ -119,11 +120,12 @@ $("#video-submit").submit(function(e) {
   }
 
   jobCount++;
-
+  var date = new Date();
+  var jobNum = date.getHours() + "" + date.getMinutes() + date.getMilliseconds()
   var jobData = {
     ownerid: $("#ownerid")[0].innerHTML.trim(),
     filename: video.files[0].name,
-    jobNum: jobCount,
+    jobNum: jobNum,
     filesize: video.files[0].size,
     submitDateTime: new Date(),
     status: "uploading...",
@@ -131,7 +133,7 @@ $("#video-submit").submit(function(e) {
   }
 
   // Update form job number, ownerid
-  form.elements["job-number"].value = jobCount;
+  form.elements["job-number"].value = jobNum;
   form.elements["ownerid"].value = $("#ownerid")[0].innerHTML.trim();
 
   // Send form data to server
@@ -226,10 +228,10 @@ function addJobToJobList(jobData) {
         $(".job-" + jobData.jobNum).loadTemplate($("#template"),
         {
             jobName: jobData.filename,
-            jobNum: jobCount,
+            jobNum: jobData.jobNum,
             filesize: formatBytes(jobData.filesize, 2),
             submit_time: jobData.submitDateTime,
-            status: jobData.status,
+            status: statusStrings[jobData.status],
             thumbnail: "/img/thumbnail.gif"
           }, { success: function() {
             // Executed after template is filled -- animates job entrance
@@ -248,7 +250,9 @@ function addJobToJobList(jobData) {
               if (jobCount == 1) $('.no-job-text').animate({"opacity": "0"}, 700).detach();
 
               // Hide job-processing icon
-              //$('.job-processing-icon').animate({"opacity": "0"}, 500).detach();
+              if(jobData.status == 3) {
+                $('.job-processing-icon').animate({"opacity": "0"}, 500).detach();
+              }
             }
         });
     });
@@ -269,8 +273,9 @@ function formatBytes(bytes, decimals) {
  * Will send an AJAX POST request to the server to begin pipeline execution.
  */
 $(document).on('click', ".start-job-button", function(e) {
-    var jobNum = e.currentTarget.id;
-
+   var date = new Date();
+    var jobNum = e.currentTarget.id;//e.currentTarget.id;
+    console.log("!!!!!!!!! jobNum: " + jobNum);
     $.ajax({
       url: "/start-job",
       method: "POST",
@@ -323,37 +328,47 @@ function jobExecListener(jobNum) {
  */
 $(document).ready(function() {
 
-    $.ajax({
-      url: "/getjobs:ownerid",
-      method: "GET",
-      data: {
-        "ownerid" : $("#ownerid")[0].innerHTML.trim()
-      }
-    })
-    .done(function(e) {
-      if (e)
-      {
-        console.log(JSON.stringify(e));
-      }
-    });
+    // $.ajax({
+    //   url: "/getjobs:ownerid",
+    //   method: "GET",
+    //   data: {
+    //     "ownerid" : $("#ownerid")[0].innerHTML.trim()
+    //   }
+    // })
+    // .done(function(e) {
+    //   if (e)
+    //   {
+    //     console.log(JSON.stringify(e));
+    //   }
+    // });
 
-    var jobs = getJobs( $("#ownerid")[0].innerHTML.trim() );
+    // var jobs = getJobs( $("#ownerid")[0].innerHTML.trim() );
 
-    for (var j of jobs)
-    {
-      console.log(JSON.stringify(j));
-      /*
-      var jobData = {
-        ownerid: $("#ownerid")[0].innerHTML.trim(),
-        filename: video.files[0].name,
-        jobNum: jobCount,
-        filesize: video.files[0].size,
-        submitDateTime: new Date(),
-        status: "uploading...",
-        pingType: 0
-      }
-      */
+    // for (var j of jobs)
+    // {
+    //   console.log(JSON.stringify(j));
+       $.post( "http://localhost:3000/getjobs", { ownerid: $("#ownerid")[0].innerHTML.trim()})
+        .done(function( data ) {
+          
+          console.log(data);
+          for(var i = 0; i < data.length; i++) {
+            var jobData = {
+              ownerid: data[i].ownerid,
+              filename: data[i].originalname,
+              jobNum: data[i].jobnumber,
+              filesize: data[i].size,
+              submitDateTime: new Date(),
+              status: data[i].status,
+              pingType: 0
+            }
 
-      addJobToJobList(jobData);
-    }
+          console.log(jobData);
+
+       
+
+       addJobToJobList(jobData);
+        }
+      });   
+     
+    
 });
