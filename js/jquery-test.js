@@ -222,7 +222,7 @@ function uploadListener(jobData) {
  *
  *  jobData: array of data about the job
  */
-function addJobToJobList(jobData) {
+function addJobToJobList(jobData, initial) {
   $('.job-list').append($("<div class=\"job-" + jobData.jobNum + "\"/>").load( "/templates/job.html", function() {
     $.getScript('/js/jquery.loadTemplate.min.js', function()
     {
@@ -252,8 +252,8 @@ function addJobToJobList(jobData) {
               if (jobCount == 1) $('.no-job-text').animate({"opacity": "0"}, 700).detach();
 
               // Hide job-processing icon
-              if(jobData.status == 0 || jobData.complete) {
-                $('.job-processing-icon').animate({"opacity": "0"}, 500).detach();
+              if(jobData.status == 0 || jobData.complete || initial) {
+                $('.job-processing-icon').animate({"opacity": "0"}, 500);
               }
             }
         });
@@ -397,28 +397,29 @@ $(document).ready(function() {
     // for (var j of jobs)
     // {
     //   console.log(JSON.stringify(j));
-       $.post( "http://localhost:3000/getjobs", { ownerid: $("#ownerid")[0].innerHTML.trim()})
+       $.post( "/getjobs", { ownerid: $("#ownerid")[0].innerHTML.trim()})
         .done(function( data ) {
 
           console.log(data);
-          for(var i = 0; i < data.length; i++) {
-            var jobData = {
-              ownerid: data[i].ownerid,
-              filename: data[i].originalname,
-              jobNum: data[i].jobnumber,
-              filesize: data[i].size,
-              submitDateTime: new Date(),
-              status: data[i].status,
-              pingType: 0
+          if (data.length != 0)
+          {
+            for(var i = 0; i < data.length; i++) {
+              var jobData = {
+                ownerid: data[i].ownerid,
+                filename: data[i].originalname,
+                jobNum: data[i].jobnumber,
+                filesize: data[i].size,
+                submitDateTime: new Date(),
+                status: data[i].status,
+                pingType: 0
+              }
+
+            console.log(jobData);
+            addJobToJobList(jobData, true);
             }
-
-          console.log(jobData);
-
-
-
-       addJobToJobList(jobData);
-        }
-      });
+            $('.no-job-text').animate({"opacity": "0"}, 700).detach();
+          }
+        });
 
 
 });

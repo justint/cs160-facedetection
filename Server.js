@@ -29,7 +29,7 @@ require('./config/passport')(passport); // pass passport for configuration
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
-  secret: 'slob on my knob like corn on the cob',
+  secret: '<session secret>',
   resave: true,
   saveUninitialized: true
 }));
