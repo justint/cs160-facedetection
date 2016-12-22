@@ -1,8 +1,17 @@
-# CV Web Interface
+# Face Detection Pipeline
+
+A face detection web application which takes in video files, detects faces, and draws a Delaunay triangulation pattern over each detected face (along with tracked pupil dots). Supports multiple asynchronous jobs in a job queue and Facebook/Twitter/Google authentication.
+
+## Required components
+
+- Node.js
+- Postgres
+- Python 2.7
+- [OpenFace](https://github.com/TadasBaltrusaitis/OpenFace)
 
 ## Installing
 
-Install the required modules:
+Install the required Node.js modules:
 
 `$ npm install`
 
@@ -38,7 +47,21 @@ Ta-da! Now navigate your browser to `127.0.0.1:3000`.
 
 ## To do
 
-### Must do:
+### GitHub cleanup
+
+- [ ] Remove "Successfully saved job data to file" message upon quit
+
+- [ ] Change all absolute paths to relative paths
+
+- [ ] Update readme to include instructions on:
+  - [ ] Setting up path to OpenFace
+  - [ ] Modifying auth.js
+
+- [ ] Add images to readme
+
+### Project related tasks
+
+#### Must do:
 
 
 - [x] Load jobs from ownerid on dashboard.ejs load (client-side request to server)
@@ -66,7 +89,7 @@ Ta-da! Now navigate your browser to `127.0.0.1:3000`.
 
 - [x] Assemble Passport.js/OpenID authentication implementation with this web interface
 
-### Should do (code cleanup):
+#### Should do (code cleanup):
 
 - [ ] Finish commenting jquery-test.js, rename it to something proper
 - [ ] Convert status text changes and job processing icon show/hides (client-side) into separate functions ( setStatus(statusText), jobIconVisibility(true/false) )
@@ -76,7 +99,7 @@ Ta-da! Now navigate your browser to `127.0.0.1:3000`.
 - [x] Have interface load what jobs are in current user's queue list on page load
 - [x] Large files take time to upload. Unfortunately, the client-side automatically adds the job to the UI list before it knows if the file is uploaded, possibly causing errors. I'll need to modify the templated HTML to have the button disabled by default, and have a loop on the client-side to ping the server periodically if the job file is uploaded. Once the server begins processing the file (app.post('/create-job'...) ), the server will return that request with a truthy value, indicating the file is fully uploaded.
 
-### Want to do:
+#### Want to do:
 
 - [ ] Implement progress bar in web interface for each pipeline step
 - [ ] ~~Support FBX file output from tracked face animation~~
