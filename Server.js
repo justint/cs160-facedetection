@@ -1,3 +1,5 @@
+/* jshint esversion: 6 */
+
 // Import modules
 var express = require("express");
 var session = require('express-session');
@@ -22,7 +24,7 @@ var app = express();
 console.log("Initializing server...");
 
 // Initialize empty list of jobs
-var jobList = new Object();
+var jobList = {};
 require('./config/passport')(passport); // pass passport for configuration
 
 // Enable body-parser for JSON parsing
@@ -45,21 +47,6 @@ router.use(function (req,res,next) {
 
   clearShell();
 });
-
-
-
-/*
-router.get("/dashboard", function(req,res){
-  res.render("dashboard.ejs");
-  //res.sendFile(path + "dashboard.html");
-});
-*/
-/*
-router.get("/stats", function(req,res){
-  res.sendFile(path + "stats.html");
-});
-*/
-
 
 // Handle when user starts a job
 app.post('/start-job', function (req, res){
@@ -166,7 +153,7 @@ function updateJobStatus(ownerid, jobnumber, status) {
     client.query('UPDATE jobs SET status=($3) WHERE ownerid=($1) AND jobnumber=($2)',
     [ownerid, jobnumber, status]);
   });
-};
+}
 
 /*
   returns a list of jobs for a user
@@ -228,7 +215,7 @@ app.post("/job-status", function(req, res){
   {
     case 0: // Upload status
     {
-      if (jobList["" + req.body.jobNum] != null)
+      if (jobList["" + req.body.jobNum] !== null)
       {
         console.log("File upload complete, adding to client job list...");
         res.status(200).send(req.body.jobNum);
@@ -276,19 +263,6 @@ app.listen(3000, function() {
   // Make jobList accessible to shell
   replServer.context.jobList = jobList;
 
-  // Define .shutdown command
-  /*
-  replServer.defineCommand('shutdown', {
-    help: 'Shuts down server gracefully',
-    action: function() {
-      this.lineParser.reset();
-      this.bufferedCommand = '';
-
-      safeShutdown();
-    }
-  });
-  */
-
   // Handle Cntl-C quits
   replServer.on('exit', safeShutdown);
 
@@ -299,6 +273,6 @@ function clearShell() {
 }
 
 function safeShutdown() {
-  console.log('Successfully saved job data to file');
+
   process.exit();
 }

@@ -49,7 +49,7 @@ Ta-da! Now navigate your browser to `127.0.0.1:3000`.
 
 ### GitHub cleanup
 
-- [ ] Remove "Successfully saved job data to file" message upon quit
+- [x] Remove "Successfully saved job data to file" message upon quit
 
 - [ ] Change all absolute paths to relative paths
 
