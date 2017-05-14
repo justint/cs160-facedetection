@@ -11,8 +11,8 @@ var strings = {
   ready_to_start : "ready to start",
   processing : "processing...",
   done : "job complete"
-}
-var statusStrings = ["uploading...","ready to start", "processing...", "job complete"]
+};
+var statusStrings = ["uploading...","ready to start", "processing...", "job complete"];
 
 /* Handler for new job button below job list, displays new job panel. */
 $( "#add-job" ).click(function() {
@@ -33,7 +33,7 @@ var Alerts = {
   SUCCESS : 1,
   INFO : 2,
   WARNING : 3
-}
+};
 
 /**
  * Produces job-related alerts and injects them into the page.
@@ -57,7 +57,7 @@ function genJobAlert(alertType, jobData) {
                 $(".alert-success-job-" + jobData.jobNum).animate({"opacity": 1}, 500);
               }
             }
-          )
+          );
         });
       }));
       break;
@@ -121,7 +121,7 @@ $("#video-submit").submit(function(e) {
 
   jobCount++;
   var date = new Date();
-  var jobNum = date.getHours() + "" + date.getMinutes() + date.getMilliseconds()
+  var jobNum = date.getHours() + "" + date.getMinutes() + date.getMilliseconds();
   var jobData = {
     ownerid: $("#ownerid")[0].innerHTML.trim(),
     filename: video.files[0].name,
@@ -130,7 +130,7 @@ $("#video-submit").submit(function(e) {
     submitDateTime: new Date(),
     status: "uploading...",
     pingType: 0
-  }
+  };
 
   // Update form job number, ownerid
   form.elements["job-number"].value = jobNum;
@@ -166,7 +166,7 @@ function uploadListener(jobData) {
     var ping = setInterval(function() {
 
       var iframeServerResponse = $('iframe')["0"].contentDocument.documentElement.innerText;
-      if (iframeServerResponse.localeCompare("") != 0)
+      if (iframeServerResponse.localeCompare("") !== 0)
       {
         iframeServerResponse = JSON.parse(iframeServerResponse);
         if (iframeServerResponse.error)
@@ -252,7 +252,7 @@ function addJobToJobList(jobData, initial) {
               if (jobCount == 1) $('.no-job-text').animate({"opacity": "0"}, 700).detach();
 
               // Hide job-processing icon
-              if(jobData.status == 0 || jobData.complete || initial) {
+              if(jobData.status === 0 || jobData.complete || initial) {
                 $('.job-processing-icon').animate({"opacity": "0"}, 500);
               }
             }
@@ -263,7 +263,7 @@ function addJobToJobList(jobData, initial) {
 
 // Used in job filesize formatting
 function formatBytes(bytes, decimals) {
-   if(bytes == 0) return '0 bytes';
+   if(bytes === 0) return '0 bytes';
    var k = 1000; // or 1024 for binary
    var dm = decimals + 1 || 3;
    var sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
@@ -360,7 +360,7 @@ function jobExecListener(jobNum) {
                     });
                   }
                 }
-              )
+              );
             });
 
           //$("#job-player-source").attr('src', jobPath);
@@ -401,7 +401,7 @@ $(document).ready(function() {
         .done(function( data ) {
 
           console.log(data);
-          if (data.length != 0)
+          if (data.length !== 0)
           {
             for(var i = 0; i < data.length; i++) {
               var jobData = {
@@ -412,7 +412,7 @@ $(document).ready(function() {
                 submitDateTime: new Date(),
                 status: data[i].status,
                 pingType: 0
-              }
+              };
 
             console.log(jobData);
             addJobToJobList(jobData, true);

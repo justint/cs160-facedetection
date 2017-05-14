@@ -3,7 +3,7 @@ import sys
 import os
 import extract_metadata
 
-abs_path = "/Users/justintennant/Desktop/cs160-testdrive/exec/frame_split"
+abs_path = os.path.dirname(os.path.realpath(__file__)) + "/frame_split"
 
 path_to_vid = sys.argv[1]
 fps = extract_metadata.find_fps(path_to_vid)
@@ -20,7 +20,7 @@ def create_new_folder():
 
 
 def extract_stills(output):
-    cmd_split = ["ffmpeg", "-i", path_to_vid, "-vf", "fps=" + str(fps), output + "/out%d.png"]
+    cmd_split = ["ffmpeg", "-i", path_to_vid, "-vf", "fps=" + str(fps), "-qscale:v", "2", output + "/out%d.jpg"]
     subprocess.call(cmd_split)
     return output
 
