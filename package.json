@@ -1,9 +1,15 @@
 {
-  "name": "cs160-testdrive",
-  "version": "0.2.1",
+  "name": "cs160-facedetection",
+  "version": "0.3.1",
   "scripts": {
     "start": "node Server.js"
   },
+  "repository":
+  { "type": "git"
+    , "url": "https://github.com/justint/cs160-facedetection.git"
+  },
+  "license": "MIT",
+  "private": true,
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "latest",
